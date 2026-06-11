@@ -1,0 +1,133 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getFixtureSummary, getMatchPrediction } from "@/lib/db/queries";
+import { Panel, ProbBar, BigStat, pct } from "@/components/ui";
+
+export const dynamic = "force-dynamic";
+
+export default async function MatchPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const fixtureId = Number(id);
+  const fx = getFixtureSummary(fixtureId);
+  const pred = getMatchPrediction(fixtureId);
+  if (!fx || !pred) notFound();
+
+  const m = pred.markets;
+  // El marcador lo decide el modelo; Betano es input (anclaje) y referencia.
+  const rec = pred.recommended;
+  const ref = pred.betanoReference;
+  const srcLabel: Record<string, string> = {
+    "market-anchored": "Modelo, anclado a las cuotas de Betano",
+    "model": "Modelo (sin cuotas todavía)",
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Cabecera del partido */}
+      <div className="border-b border-line pb-6">
+        <div className="uptick text-[10px] text-muted">
+          {fx.venue ? `${fx.venue} · ` : ""}Grupo {fx.groupLetter}
+        </div>
+        <div className="mt-2 flex items-center justify-center gap-6 text-center">
+          <div className="flex-1 text-right text-2xl font-bold text-chalk md:text-3xl">{pred.homeName}</div>
+          <div className="tnum text-acid text-lg">
+            {pred.lambdaHome.toFixed(2)} · {pred.lambdaAway.toFixed(2)}
+          </div>
+          <div className="flex-1 text-left text-2xl font-bold text-chalk md:text-3xl">{pred.awayName}</div>
+        </div>
+        <div className="mt-1 text-center uptick text-[10px] text-muted">Goles esperados (xG modelo)</div>
+        {pred.marketUsed && (
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[10px] uptick text-muted">
+            <span className="text-acid">● Anclado a Betano</span>
+            <span>1X2: {pred.marketUsed.home} / {pred.marketUsed.draw} / {pred.marketUsed.away}</span>
+            {pred.marketUsed.ouOver && (
+              <span>Más/Menos 2.5: {pred.marketUsed.ouOver} / {pred.marketUsed.ouUnder}</span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* 1X2 grande */}
+      <div className="grid grid-cols-3 gap-px bg-line">
+        <div className="bg-panel p-5 text-center">
+          <BigStat value={pct(m.result.home)} label={`Gana ${pred.homeName}`} accent={m.result.home >= m.result.away} />
+        </div>
+        <div className="bg-panel p-5 text-center">
+          <BigStat value={pct(m.result.draw)} label="Empate" />
+        </div>
+        <div className="bg-panel p-5 text-center">
+          <BigStat value={pct(m.result.away)} label={`Gana ${pred.awayName}`} accent={m.result.away > m.result.home} />
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Marcador a jugar en el prode */}
+        <Panel title="Marcador para tu prode" accent>
+          <div className="flex items-end justify-between">
+            <BigStat value={`${rec.home}-${rec.away}`} label="Marcador a jugar" accent />
+            {rec.prob != null && (
+              <div className="text-right">
+                <div className="tnum text-2xl text-chalk">{pct(rec.prob)}</div>
+                <div className="uptick text-[10px] text-muted">Probabilidad</div>
+              </div>
+            )}
+          </div>
+          <p className="mt-4 border-t border-line pt-3 text-xs leading-relaxed text-muted">
+            Lo decide el modelo: {srcLabel[rec.source]}.
+          </p>
+          {ref && (
+            <div className="mt-2 flex items-center justify-between border-t border-line pt-3 text-xs">
+              <span className="uptick text-[10px] text-muted">Referencia Betano</span>
+              <span className={ref.agrees ? "text-acid" : "text-chalk"}>
+                {ref.home}-{ref.away} {ref.agrees ? "· coincide ✓" : "· difiere"}
+              </span>
+            </div>
+          )}
+        </Panel>
+
+        {/* Top 5 marcadores exactos */}
+        <Panel title="Marcadores exactos más probables">
+          <div className="space-y-2">
+            {m.topScores.map((s) => (
+              <ProbBar key={`${s.home}-${s.away}`} label={`${s.home} - ${s.away}`} value={s.prob} />
+            ))}
+          </div>
+        </Panel>
+
+        {/* Goles */}
+        <Panel title="Goles · Over / Under">
+          <div className="space-y-2">
+            {m.overUnder.map((ou) => (
+              <ProbBar key={ou.line} label={`Over ${ou.line}`} value={ou.over} />
+            ))}
+            <div className="pt-2">
+              <ProbBar label="Ambos marcan" value={m.bttsYes} />
+            </div>
+          </div>
+        </Panel>
+
+        {/* Doble oportunidad + portería a cero */}
+        <Panel title="Doble oportunidad y portería a cero">
+          <div className="space-y-2">
+            <ProbBar label="1X" value={m.doubleChance.homeOrDraw} />
+            <ProbBar label="12" value={m.doubleChance.homeOrAway} />
+            <ProbBar label="X2" value={m.doubleChance.drawOrAway} />
+            <div className="pt-2 space-y-2">
+              <ProbBar label="Cero local" value={m.cleanSheet.home} />
+              <ProbBar label="Cero visita" value={m.cleanSheet.away} />
+            </div>
+          </div>
+        </Panel>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <Link href={`/grupo/${fx.groupLetter}`} className="uptick text-xs text-muted hover:text-acid">
+          ← Grupo {fx.groupLetter}
+        </Link>
+        <Link href={`/captura/partido/${fx.id}`} className="uptick text-xs text-acid hover:underline">
+          Modo captura ↗
+        </Link>
+      </div>
+    </div>
+  );
+}

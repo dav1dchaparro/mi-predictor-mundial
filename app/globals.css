@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+body {
+  background-color: #0a0e0f;
+  color: #e7f0ee;
+  font-family: var(--font-mono);
+  /* textura sutil tipo panel de datos */
+  background-image: radial-gradient(rgba(200, 255, 0, 0.03) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* numeración tabular para que los números no "bailen" */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.uptick {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
