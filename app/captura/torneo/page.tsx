@@ -2,7 +2,6 @@ import { getTournamentOdds } from "@/lib/db/queries";
 import { CaptureFrame } from "@/components/capture";
 import { pct } from "@/components/ui";
 
-export const dynamic = "force-dynamic";
 
 export default function CaptureTournament() {
   const odds = getTournamentOdds();

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { getValidationSummary } from "@/lib/backtest/summary";
 import { Panel, BigStat, ProbBar, pct } from "@/components/ui";
 
-export const dynamic = "force-dynamic";
 
 export default function PrecisionPage() {
   const v = getValidationSummary();

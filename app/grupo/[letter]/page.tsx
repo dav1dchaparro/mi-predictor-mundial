@@ -3,7 +3,11 @@ import { notFound } from "next/navigation";
 import { getGroupProjection, getFixtures, getGroupLetters } from "@/lib/db/queries";
 import { Panel, pct } from "@/components/ui";
 
-export const dynamic = "force-dynamic";
+// Export estático: pre-genera una página por grupo y no admite otros params.
+export const dynamicParams = false;
+export function generateStaticParams() {
+  return getGroupLetters().map((letter) => ({ letter }));
+}
 
 export default async function GroupPage({ params }: { params: Promise<{ letter: string }> }) {
   const { letter } = await params;

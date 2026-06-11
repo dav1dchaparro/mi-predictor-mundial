@@ -2,7 +2,6 @@ import Link from "next/link";
 import { getFixtures } from "@/lib/db/queries";
 import { Panel } from "@/components/ui";
 
-export const dynamic = "force-dynamic";
 
 export default function FixturesIndex() {
   const fixtures = getFixtures();

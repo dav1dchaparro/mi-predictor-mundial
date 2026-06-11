@@ -1,9 +1,13 @@
 import { notFound } from "next/navigation";
-import { getFixtureSummary, getMatchPrediction } from "@/lib/db/queries";
+import { getFixtureSummary, getMatchPrediction, getFixtures } from "@/lib/db/queries";
 import { CaptureFrame, CaptureStat } from "@/components/capture";
 import { pct } from "@/components/ui";
 
-export const dynamic = "force-dynamic";
+// Export estático: pre-genera una página por partido y no admite otros params.
+export const dynamicParams = false;
+export function generateStaticParams() {
+  return getFixtures().map((f) => ({ id: String(f.id) }));
+}
 
 export default async function CaptureMatch({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

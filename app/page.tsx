@@ -2,8 +2,6 @@ import Link from "next/link";
 import { getTournamentOdds, getGoldenBoot, getGroupLetters } from "@/lib/db/queries";
 import { Panel, ProbBar, BigStat, pct } from "@/components/ui";
 
-export const dynamic = "force-dynamic";
-
 export default function Home() {
   const odds = getTournamentOdds();
   const boot = getGoldenBoot(8);
