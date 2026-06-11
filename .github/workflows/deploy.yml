@@ -1,7 +1,8 @@
 name: Deploy a GitHub Pages
 
-# Construye el sitio estático y lo publica. El modelo corre offline y es
-# determinista, así que la base de datos se regenera en CI (no se versiona).
+# Construye el sitio estático y lo publica. Lee la DB versionada
+# (data/mundial.db) y "hornea" las predicciones en HTML.
+# Para refrescar datos: `npm run cron:run` en local y commitear la DB.
 
 on:
   push:
@@ -31,9 +32,6 @@ jobs:
 
       - name: Instalar dependencias
         run: npm ci
-
-      - name: Sembrar datos y calcular predicciones (offline)
-        run: npm run cron:run
 
       - name: Build estático
         run: npm run build

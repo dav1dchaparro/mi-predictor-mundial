@@ -1,7 +1,8 @@
 node_modules/
 .next/
 out/
-data/
-*.db
 *.db-*
+data/*
+# La DB del modelo (determinista, offline) se versiona para que CI solo construya.
+!data/mundial.db
 .env.local
