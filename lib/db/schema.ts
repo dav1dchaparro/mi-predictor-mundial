@@ -72,23 +72,60 @@ CREATE TABLE IF NOT EXISTS predictions (
 CREATE TABLE IF NOT EXISTS odds (
   fixture_id INTEGER PRIMARY KEY REFERENCES fixtures(id),
   betano_url TEXT,
-  home REAL, draw REAL, away REAL,   -- 1X2 (cuotas decimales)
-  ou_over REAL, ou_under REAL,        -- Over/Under 2.5 goles (nullable)
-  exact_top TEXT,                     -- JSON [{score,price}] de la casa (nullable)
-  scraped_at TEXT
+  home REAL, draw REAL, away REAL,   -- 1X2 Betano (cuotas decimales)
+  ou_over REAL, ou_under REAL,        -- Over/Under 2.5 goles Betano (nullable)
+  exact_top TEXT,                     -- JSON [{score,price}] de Betano (nullable)
+  scraped_at TEXT,
+  pin_home REAL, pin_draw REAL, pin_away REAL,  -- 1X2 Pinnacle (segunda fuente, nullable)
+  pin_scraped_at TEXT,
+  oa_home REAL, oa_draw REAL, oa_away REAL,      -- 1X2 consenso EU de The Odds API (3ª fuente, nullable)
+  oa_over REAL, oa_under REAL,                   -- Over/Under 2.5 consenso EU (nullable)
+  oa_books TEXT, oa_scraped_at TEXT              -- casas que aportaron + timestamp
+);
+
+-- Resultados históricos de selecciones (amistosos, eliminatorias, Nations League,
+-- Copa América, Euro, Mundiales...). Alimentan el refit de fuerzas por MLE con
+-- ponderación temporal (lib/model/fit.ts). Crudo y reusable; el modelo no lo toca.
+CREATE TABLE IF NOT EXISTS matches_history (
+  id INTEGER PRIMARY KEY,
+  api_fixture_id INTEGER UNIQUE,   -- dedup al re-ingerir
+  home_name TEXT NOT NULL,         -- nombre crudo de la fuente (inglés)
+  away_name TEXT NOT NULL,
+  home_goals INTEGER NOT NULL,
+  away_goals INTEGER NOT NULL,
+  played_at TEXT NOT NULL,         -- ISO; se usa para el decay temporal
+  competition TEXT,
+  league_id INTEGER
 );
 
 CREATE INDEX IF NOT EXISTS idx_pred_fixture ON predictions(fixture_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_fixtures_stage ON fixtures(stage, kickoff);
+CREATE INDEX IF NOT EXISTS idx_history_played ON matches_history(played_at);
 `;
 
 let dbInstance: Database.Database | null = null;
+
+/** Agrega columnas nuevas a DBs ya creadas (CREATE TABLE IF NOT EXISTS no lo hace). */
+function migrate(db: Database.Database): void {
+  const cols = new Set(
+    (db.prepare("PRAGMA table_info(odds)").all() as { name: string }[]).map((c) => c.name),
+  );
+  const add: Record<string, string> = {
+    pin_home: "REAL", pin_draw: "REAL", pin_away: "REAL", pin_scraped_at: "TEXT",
+    oa_home: "REAL", oa_draw: "REAL", oa_away: "REAL",
+    oa_over: "REAL", oa_under: "REAL", oa_books: "TEXT", oa_scraped_at: "TEXT",
+  };
+  for (const [name, type] of Object.entries(add)) {
+    if (!cols.has(name)) db.exec(`ALTER TABLE odds ADD COLUMN ${name} ${type}`);
+  }
+}
 
 export function getDb(path = "data/mundial.db"): Database.Database {
   if (dbInstance) return dbInstance;
   dbInstance = new Database(path);
   dbInstance.pragma("journal_mode = WAL");
   dbInstance.exec(SCHEMA);
+  migrate(dbInstance);
   return dbInstance;
 }
 

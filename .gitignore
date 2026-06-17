@@ -1,6 +1,7 @@
 node_modules/
 .next/
 out/
+*.tsbuildinfo
 *.db-*
 data/*
 # La DB del modelo (determinista, offline) se versiona para que CI solo construya.

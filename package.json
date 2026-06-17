@@ -12,7 +12,9 @@
     "cron:run": "tsx scripts/cron.ts",
     "backtest": "tsx scripts/backtest.ts",
     "optimize": "tsx scripts/optimize.ts",
-    "odds": "tsx scripts/odds.ts"
+    "odds": "tsx scripts/odds.ts",
+    "market": "tsx scripts/market.ts",
+    "fit": "tsx scripts/fit.ts"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.11",

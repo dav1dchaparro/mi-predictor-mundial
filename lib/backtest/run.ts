@@ -31,6 +31,9 @@ export interface BacktestResult {
     hit1X2: boolean;
     hitExact: boolean;
     pts: number;
+    /** probabilidades 1X2 del modelo y resultado real, para calibración. */
+    probs: { home: number; draw: number; away: number };
+    realOutcome: Outcome;
   }[];
 }
 
@@ -93,6 +96,8 @@ export function runBacktest(
       hit1X2: wasHit1X2,
       hitExact: wasHitExact,
       pts,
+      probs: { home: r.home, draw: r.draw, away: r.away },
+      realOutcome,
     });
   }
 

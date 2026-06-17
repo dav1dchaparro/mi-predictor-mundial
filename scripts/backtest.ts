@@ -1,5 +1,6 @@
 // Reporte de backtest. Correr: npx tsx scripts/backtest.ts
 import { runBacktest, type BacktestResult } from "../lib/backtest/run.js";
+import { calibration } from "../lib/backtest/calibration.js";
 import { QATAR_GROUP_MATCHES, QATAR_RATINGS, HOST_2022 } from "../lib/backtest/qatar2022.js";
 import { EURO_GROUP_MATCHES, EURO_RATINGS, HOST_EURO } from "../lib/backtest/euro2024.js";
 import { WC2018_GROUP_MATCHES, WC2018_RATINGS, HOST_2018 } from "../lib/backtest/wc2018.js";
@@ -47,3 +48,19 @@ console.log(`\n  ── AGREGADO (${n} partidos, 3 torneos) ──`);
 console.log(`  Acierto 1X2:             ${pct(p)}  ± ${(se * 100).toFixed(1)}% (IC95 ~${pct(p - 1.96 * se)}–${pct(p + 1.96 * se)})`);
 console.log(`  Acierto marcador exacto: ${pct(hitExact / n)}`);
 console.log(`  Puntos de polla:         ${pollaPoints}/${pollaMax}  (${pct(pollaPoints / pollaMax)})\n`);
+
+// ── CALIBRACIÓN (curvas de fiabilidad) ──
+const points = all.flatMap((r) => r.details.map((d) => ({ probs: d.probs, realOutcome: d.realOutcome })));
+const cal = calibration(points, 10);
+console.log(`  ── CALIBRACIÓN (${cal.n} partidos, ${cal.n * 3} probabilidades 1X2) ──`);
+console.log(`  Brier score:  ${cal.brier.toFixed(4)}   (0 = perfecto; azar 1X2 ≈ 0.2222; menor es mejor)`);
+console.log(`  Sesgo empate: P(X) media ${pct(cal.meanDrawProb)} vs empates reales ${pct(cal.drawRate)}  -> ${cal.drawBias >= 0 ? "+" : ""}${(cal.drawBias * 100).toFixed(1)} pp ${cal.drawBias > 0.02 ? "(SOBREESTIMA empates)" : cal.drawBias < -0.02 ? "(SUBESTIMA empates)" : "(ok)"}`);
+console.log(`\n  Bin prob.   n    predicho   observado   (| = predicho, # = observado)`);
+for (const b of cal.bins) {
+  if (!b.count) continue;
+  const bar = (x: number) => "#".repeat(Math.round(x * 20));
+  console.log(
+    `  ${pct(b.lo).padStart(5)}-${pct(b.hi).padEnd(5)} ${String(b.count).padStart(4)}   ${pct(b.meanPred).padStart(7)}   ${pct(b.observed).padStart(8)}   ${bar(b.observed)}`,
+  );
+}
+console.log("");

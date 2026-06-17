@@ -18,20 +18,67 @@ export interface OverUnderOdds {
   under: number;
 }
 
-/** Quita el margen de la casa (overround) y devuelve probabilidades justas. */
-export function fairProbs1X2(odds: Odds1X2): { home: number; draw: number; away: number } {
-  const ih = 1 / odds.home;
-  const id = 1 / odds.draw;
-  const ia = 1 / odds.away;
-  const sum = ih + id + ia; // > 1 por el margen
-  return { home: ih / sum, draw: id / sum, away: ia / sum };
+/**
+ * Devig MULTIPLICATIVO (normalización proporcional): reparte el margen en
+ * proporción a las inversas. Es el método más simple pero, según la literatura
+ * (Štrumbelj 2014; Clarke 2017), el MENOS preciso: infla los favoritos extremos
+ * (favourite-longshot bias). Se conserva como referencia y fallback.
+ */
+export function devigMultiplicative(prices: number[]): number[] {
+  const inv = prices.map((p) => 1 / p);
+  const sum = inv.reduce((s, x) => s + x, 0);
+  return inv.map((x) => x / sum);
+}
+
+/**
+ * Devig por el MÉTODO DE SHIN. Modela el margen como la presencia de una
+ * proporción `z` de apostadores informados ("insiders"); resolver z reparte el
+ * overround de forma que castiga más a los favoritos y menos a los longshots,
+ * quedando mejor calibrado que el multiplicativo en casi todas las casas
+ * (Štrumbelj 2014; Clarke et al. 2017 — Shin es el mejor para Pinnacle/bet365).
+ *
+ * Para precios crudos π_i = 1/o_i con B = Σπ_i (>1), la prob. justa es
+ *   p_i(z) = (√(z² + 4(1−z)·π_i²/B) − z) / (2(1−z))
+ * y se busca z ∈ [0,1) tal que Σ p_i(z) = 1 (Σ es decreciente en z).
+ */
+export function devigShin(prices: number[]): number[] {
+  const pi = prices.map((p) => 1 / p);
+  const B = pi.reduce((s, x) => s + x, 0);
+  if (!(B > 1)) return pi.slice(); // sin margen (o degenerado): nada que quitar
+  const probs = (z: number) =>
+    pi.map((x) => (Math.sqrt(z * z + 4 * (1 - z) * (x * x) / B) - z) / (2 * (1 - z)));
+  const sumAt = (z: number) => probs(z).reduce((s, x) => s + x, 0);
+  // Σ(0) = √B > 1 ; Σ crece-decrece monótona en z -> bisección hacia Σ=1.
+  let lo = 0;
+  let hi = 0.5;
+  while (sumAt(hi) > 1 && hi < 0.999) hi = (hi + 1) / 2; // asegura el cruce
+  for (let i = 0; i < 80; i++) {
+    const mid = (lo + hi) / 2;
+    if (sumAt(mid) > 1) lo = mid;
+    else hi = mid;
+  }
+  const z = (lo + hi) / 2;
+  const p = probs(z);
+  const s = p.reduce((a, x) => a + x, 0);
+  return p.map((x) => x / s); // renormaliza por seguridad numérica
+}
+
+/**
+ * Quita el margen de la casa (overround) y devuelve probabilidades justas 1X2.
+ * Usa Shin por defecto (mejor calibrado); `multiplicative` para el método simple.
+ */
+export function fairProbs1X2(
+  odds: Odds1X2,
+  method: "shin" | "multiplicative" = "shin",
+): { home: number; draw: number; away: number } {
+  const devig = method === "shin" ? devigShin : devigMultiplicative;
+  const [home, draw, away] = devig([odds.home, odds.draw, odds.away]);
+  return { home: home!, draw: draw!, away: away! };
 }
 
 function fairTwoWay(over: number, under: number): { over: number; under: number } {
-  const io = 1 / over;
-  const iu = 1 / under;
-  const sum = io + iu;
-  return { over: io / sum, under: iu / sum };
+  const [o, u] = devigShin([over, under]);
+  return { over: o!, under: u! };
 }
 
 /** P(total de goles > line) bajo Poisson(lambdaTotal). */

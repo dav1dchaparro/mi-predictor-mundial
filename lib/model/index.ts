@@ -8,3 +8,5 @@ export * from "./cards.js";
 export * from "./corners.js";
 export * from "./scorers.js";
 export * from "./market.js";
+export * from "./kelly.js";
+export * from "./fit.js";

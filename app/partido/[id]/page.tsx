@@ -21,7 +21,7 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
   const rec = pred.recommended;
   const ref = pred.betanoReference;
   const srcLabel: Record<string, string> = {
-    "market-anchored": "Modelo, anclado a las cuotas de Betano",
+    "market-anchored": "Modelo, anclado al consenso de Betano + Pinnacle",
     "model": "Modelo (sin cuotas todavía)",
   };
 
@@ -42,7 +42,7 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
         <div className="mt-1 text-center uptick text-[10px] text-muted">Goles esperados (xG modelo)</div>
         {pred.marketUsed && (
           <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-[10px] uptick text-muted">
-            <span className="text-acid">● Anclado a Betano</span>
+            <span className="text-acid">● Consenso Betano + Pinnacle</span>
             <span>1X2: {pred.marketUsed.home} / {pred.marketUsed.draw} / {pred.marketUsed.away}</span>
             {pred.marketUsed.ouOver && (
               <span>Más/Menos 2.5: {pred.marketUsed.ouOver} / {pred.marketUsed.ouUnder}</span>
@@ -77,7 +77,8 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
             )}
           </div>
           <p className="mt-4 border-t border-line pt-3 text-xs leading-relaxed text-muted">
-            Lo decide el modelo: {srcLabel[rec.source]}.
+            Marcador que maximiza los puntos esperados de tu prode (no el más
+            probable). {srcLabel[rec.source]}.
           </p>
           {ref && (
             <div className="mt-2 flex items-center justify-between border-t border-line pt-3 text-xs">

@@ -54,9 +54,12 @@ export interface MatchPrediction {
   betanoReference?: { home: number; away: number; agrees: boolean };
 }
 
-// Prode de SOLO marcador exacto: únicos puntos por clavar el marcador. Con esta
-// regla el pick óptimo es, por definición, el marcador más probable.
-const DEFAULT_POLLA: PollaRules = { exactScore: 1, correctResult: 0, goalDifference: 0 };
+// Reglas de prode por defecto, alineadas con el backtest validado (lib/backtest/
+// run.ts). Premian clavar el marcador exacto, pero también acertar el resultado
+// (1X2) y la diferencia de goles. Con correctResult > 0 el pick óptimo respeta el
+// favoritismo del 1X2 en vez de colapsar a 1-1, que es la moda que infla la
+// corrección Dixon-Coles para casi cualquier favorito moderado.
+const DEFAULT_POLLA: PollaRules = { exactScore: 5, correctResult: 2, goalDifference: 1 };
 
 /** "1-0" -> {home:1, away:0}. Devuelve null si no parsea. */
 function parseScore(s: string): { home: number; away: number } | null {
@@ -103,10 +106,13 @@ export function predictMatch(ctx: MatchContext): MatchPrediction {
   const { best } = optimalPick(sm, rules);
   const mostLikely = markets.topScores[0]!;
 
-  // El marcador a jugar SIEMPRE lo decide el modelo (su matriz Poisson/Dixon-Coles),
-  // ya anclada a las cuotas si las hay. Betano es solo input y referencia.
+  // El marcador a jugar es el que MAXIMIZA los puntos esperados de la polla, no la
+  // moda de la matriz. Con favoritos moderados (lambda ~1.3-1.9) la moda colapsa a
+  // 1-1 por el boost Dixon-Coles aunque el 1X2 favorezca claramente a un equipo;
+  // el óptimo de puntos esperados sí respeta ese favoritismo. El más probable
+  // queda en topScores y en pollaPick.mostLikely como referencia. Betano es input.
   const recommended: MatchPrediction["recommended"] = {
-    home: mostLikely.home, away: mostLikely.away, prob: mostLikely.prob,
+    home: best.home, away: best.away, prob: best.exactProb,
     source: marketAnchored ? "market-anchored" : "model",
   };
 

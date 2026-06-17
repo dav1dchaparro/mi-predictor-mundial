@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { fairProbs1X2, totalGoalsFromOverUnder, marketLambdas, blendLambdas } from "./market.js";
+import { fairProbs1X2, totalGoalsFromOverUnder, marketLambdas, blendLambdas, devigShin, devigMultiplicative } from "./market.js";
 import { buildScoreMatrix, result1X2 } from "./index.js";
 
 describe("market anchoring", () => {
@@ -31,6 +31,36 @@ describe("market anchoring", () => {
     // el 1X2 derivado debe favorecer al local, como la cuota
     const r = result1X2(buildScoreMatrix(ml.lambdaHome, ml.lambdaAway, { rho: -0.06 }));
     expect(r.home).toBeGreaterThan(r.away);
+  });
+
+  it("Shin: las probabilidades suman 1 y quitan el margen", () => {
+    const p = devigShin([2.0, 3.4, 3.8]);
+    expect(p.reduce((s, x) => s + x, 0)).toBeCloseTo(1, 6);
+    // cada prob justa < la inversa cruda (se le quitó parte del margen)
+    expect(p[0]!).toBeLessThan(1 / 2.0);
+  });
+
+  it("Shin sin margen (suma de inversas = 1) devuelve las inversas tal cual", () => {
+    // cuotas justas: 1/0.5 + 1/0.5 = ... usar 2-way con B=1
+    const p = devigShin([2.0, 2.0]); // inversas 0.5+0.5 = 1, sin overround
+    expect(p[0]!).toBeCloseTo(0.5, 6);
+    expect(p[1]!).toBeCloseTo(0.5, 6);
+  });
+
+  it("Shin corrige el sesgo favorito-longshot (sube favorito, baja longshot)", () => {
+    // Shin atribuye más del margen a los longshots: respecto al multiplicativo
+    // sube la prob justa del favorito y baja la del tapado.
+    const odds = [1.2, 6.5, 13.0];
+    const shin = devigShin(odds);
+    const mult = devigMultiplicative(odds);
+    expect(shin[0]!).toBeGreaterThan(mult[0]!); // favorito más alto con Shin
+    expect(shin[2]!).toBeLessThan(mult[2]!); // longshot más bajo con Shin
+    expect(shin.reduce((s, x) => s + x, 0)).toBeCloseTo(1, 6);
+  });
+
+  it("fairProbs1X2 admite método multiplicativo explícito", () => {
+    const f = fairProbs1X2({ home: 2.0, draw: 3.4, away: 3.8 }, "multiplicative");
+    expect(f.home + f.draw + f.away).toBeCloseTo(1, 6);
   });
 
   it("el ensamble queda entre el modelo y el mercado", () => {
