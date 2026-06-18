@@ -68,6 +68,11 @@ export interface MatchPrediction {
 // corrección Dixon-Coles para casi cualquier favorito moderado.
 const DEFAULT_POLLA: PollaRules = { exactScore: 5, correctResult: 2, goalDifference: 1 };
 
+// Parámetros de la matriz de marcadores, calibrados para MAXIMIZAR aciertos de
+// marcador exacto (scripts/tuneExact.ts sobre histórico real de selecciones).
+const SCORE_RHO = -0.05; // corrección Dixon-Coles (suave; -0.14 era excesivo)
+const SCORE_NU = 1.10;   // sub-dispersión Conway-Maxwell-Poisson (1 = Poisson)
+
 /** "1-0" -> {home:1, away:0}. Devuelve null si no parsea. */
 function parseScore(s: string): { home: number; away: number } | null {
   const m = s.match(/^(\d+)\s*-\s*(\d+)$/);
@@ -105,8 +110,10 @@ export function predictMatch(ctx: MatchContext): MatchPrediction {
     marketAnchored = true;
   }
 
-  // rho -0.14: corrección Dixon-Coles calibrada por grid search (scripts/optimize.ts).
-  const sm = buildScoreMatrix(lambdaHome, lambdaAway, { rho: -0.14 });
+  // rho y nu calibrados por backtest de ACIERTO EXACTO sobre 2.039 partidos reales
+  // (scripts/tuneExact.ts): rho≈-0.05 (el -0.14 previo inflaba de más los empates)
+  // y nu=1.10 (los goles internacionales están levemente sub-dispersos vs Poisson).
+  const sm = buildScoreMatrix(lambdaHome, lambdaAway, { rho: SCORE_RHO, nu: SCORE_NU });
   const markets = deriveAllMarkets(sm);
 
   const rules = ctx.pollaRules ?? DEFAULT_POLLA;

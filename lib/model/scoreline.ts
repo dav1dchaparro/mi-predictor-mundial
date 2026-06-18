@@ -27,9 +27,11 @@ export const STRATEGY_LABELS: Record<ScorelineStrategy, string> = {
   "condicional-1x2": "Condicional al 1X2",
 };
 
-/** Estrategia recomendada por defecto. "Goles esperados" deja de lowballear:
- *  predice marcadores 2-1/1-1/1-2 alineados con los goles que el modelo espera. */
-export const DEFAULT_STRATEGY: ScorelineStrategy = "goles-esperados";
+/** Estrategia recomendada por defecto. "Más probable" (la MODA de la matriz) es
+ *  el predictor ÓPTIMO de marcador exacto bajo pérdida 0-1 (Foulley-Celeux 2018),
+ *  y lo confirma el backtest sobre 2.039 partidos reales: clava 13.7% de exactos
+ *  vs 11% de "goles-esperados" y 10.7% de "siempre 1-0". Ver scripts/tuneExact.ts. */
+export const DEFAULT_STRATEGY: ScorelineStrategy = "mas-probable";
 
 const prob = (sm: ScoreMatrix, h: number, a: number) =>
   sm.matrix[h]?.[a] ?? 0;

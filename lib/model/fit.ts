@@ -20,6 +20,8 @@ export interface FitMatch {
   awayGoals: number;
   /** antigüedad del partido en días (0 = hoy). Alimenta el decay temporal. */
   daysAgo: number;
+  /** true si se jugó en cancha neutral: no recibe ventaja de local. */
+  neutral?: boolean;
 }
 
 export interface FitOptions {
@@ -37,6 +39,8 @@ export interface FitResult {
   attack: Map<string, number>; // multiplicativo, media geométrica 1.0
   defense: Map<string, number>; // multiplicativo, media geométrica 1.0
   homeAdvantage: number; // factor multiplicativo sobre λ local (>1)
+  /** nivel base de goles del torneo = exp(μ): λ = base · atk · def · (ventaja). */
+  base: number;
   rho: number;
   logLik: number;
   iterations: number;
@@ -62,18 +66,21 @@ function poissonLogCore(k: number, lambda: number): number {
   return k * Math.log(lambda) - lambda;
 }
 
-interface Params { atk: number[]; def: number[]; logHome: number }
+interface Params { atk: number[]; def: number[]; logHome: number; mu: number }
 
 function weightedLogLik(
   p: Params, idx: Map<string, number>, matches: FitMatch[], weights: number[], rho: number,
 ): number {
   let ll = 0;
   const gamma = Math.exp(p.logHome);
+  const base = Math.exp(p.mu);
   for (let m = 0; m < matches.length; m++) {
     const mt = matches[m]!;
     const i = idx.get(mt.home)!, j = idx.get(mt.away)!;
-    const lh = Math.exp(p.atk[i]! + p.def[j]!) * gamma;
-    const la = Math.exp(p.atk[j]! + p.def[i]!);
+    // En cancha neutral no hay ventaja de local (clave para sedes del Mundial).
+    const g = mt.neutral ? 1 : gamma;
+    const lh = base * Math.exp(p.atk[i]! + p.def[j]!) * g;
+    const la = base * Math.exp(p.atk[j]! + p.def[i]!);
     const tau = dcTau(mt.homeGoals, mt.awayGoals, lh, la, rho);
     const safeTau = tau > 1e-9 ? tau : 1e-9; // evita log(≤0)
     ll += weights[m]! * (poissonLogCore(mt.homeGoals, lh) + poissonLogCore(mt.awayGoals, la) + Math.log(safeTau));
@@ -89,50 +96,83 @@ function center(arr: number[]): void {
 }
 
 /**
- * Ajusta ataque/defensa/ventaja-local por MLE con decay temporal vía ascenso por
- * gradiente numérico. Pensado para decenas de equipos y cientos/miles de partidos.
+ * Ajusta ataque/defensa/ventaja-local por MÁXIMA VEROSIMILITUD Poisson con decay
+ * temporal, vía Newton-Raphson de diagonal con GRADIENTE ANALÍTICO (una sola
+ * pasada por iteración → escala a cientos de equipos y miles de partidos). Las
+ * fuerzas se estiman bajo Poisson independiente (convención estándar: rho es una
+ * corrección local pequeña que se aplica al construir la matriz, no a las fuerzas).
+ *
+ * Gradiente del log-lik Poisson ponderado: ∂ll/∂atk_k = Σ w·(y−λ) sobre los
+ * partidos donde k ataca; Hessiano diagonal: −Σ w·λ. El paso de Newton g/H
+ * converge en pocas decenas de iteraciones (estilo IRLS). En cancha neutral no
+ * hay ventaja de local (no contribuye a logHome).
  */
 export function fitDixonColes(matches: FitMatch[], opts: FitOptions = {}): FitResult {
   const xi = opts.xi ?? 0;
   const rho = opts.rho ?? -0.14;
-  const iterations = opts.iterations ?? 400;
-  const lr = opts.learningRate ?? 0.05;
+  const iterations = opts.iterations ?? 120;
+  const damp = opts.learningRate ?? 0.5; // amortiguación del paso de Newton (0.9 oscila)
 
   const teams = [...new Set(matches.flatMap((m) => [m.home, m.away]))];
   const idx = new Map(teams.map((t, i) => [t, i]));
   const N = teams.length;
-  const weights = matches.map((m) => timeDecayWeight(m.daysAgo, xi));
-
-  const p: Params = { atk: new Array(N).fill(0), def: new Array(N).fill(0), logHome: Math.log(1.3) };
-  const eps = 1e-4;
-
-  const llAt = (q: Params) => weightedLogLik(q, idx, matches, weights, rho);
-
-  for (let it = 0; it < iterations; it++) {
-    const base = llAt(p);
-    // gradiente numérico por diferencias hacia adelante
-    const gAtk = new Array(N).fill(0);
-    const gDef = new Array(N).fill(0);
-    for (let i = 0; i < N; i++) {
-      p.atk[i]! += eps; gAtk[i] = (llAt(p) - base) / eps; p.atk[i]! -= eps;
-      p.def[i]! += eps; gDef[i] = (llAt(p) - base) / eps; p.def[i]! -= eps;
-    }
-    p.logHome += eps; const gHome = (llAt(p) - base) / eps; p.logHome -= eps;
-
-    // paso de ascenso (normalizado para estabilidad)
-    const gnorm = Math.sqrt(gAtk.concat(gDef, [gHome]).reduce((s, x) => s + x * x, 0)) || 1;
-    const step = lr / Math.max(gnorm / Math.sqrt(2 * N + 1), 1);
-    for (let i = 0; i < N; i++) { p.atk[i]! += step * gAtk[i]!; p.def[i]! += step * gDef[i]!; }
-    p.logHome += step * gHome;
-    center(p.atk); center(p.def);
+  const M = matches.length;
+  const hi = new Int32Array(M), ai = new Int32Array(M);
+  const yh = new Float64Array(M), ya = new Float64Array(M);
+  const w = new Float64Array(M), neu = new Uint8Array(M);
+  for (let m = 0; m < M; m++) {
+    const mt = matches[m]!;
+    hi[m] = idx.get(mt.home)!; ai[m] = idx.get(mt.away)!;
+    yh[m] = mt.homeGoals; ya[m] = mt.awayGoals;
+    w[m] = timeDecayWeight(mt.daysAgo, xi);
+    neu[m] = mt.neutral ? 1 : 0;
   }
 
+  const atk = new Float64Array(N), def = new Float64Array(N);
+  let logHome = Math.log(1.3);
+  let mu = Math.log(1.3); // intercepto global (nivel de goles); separa nivel de ventaja local
+
+  for (let it = 0; it < iterations; it++) {
+    const gAtk = new Float64Array(N), gDef = new Float64Array(N);
+    const hAtk = new Float64Array(N), hDef = new Float64Array(N);
+    let gHome = 0, hHome = 0, gMu = 0, hMu = 0;
+    for (let m = 0; m < M; m++) {
+      const i = hi[m]!, j = ai[m]!, wm = w[m]!;
+      const g = neu[m] ? 0 : logHome;
+      const lh = Math.exp(mu + atk[i]! + def[j]! + g);
+      const la = Math.exp(mu + atk[j]! + def[i]!);
+      const rh = wm * (yh[m]! - lh), ra = wm * (ya[m]! - la);
+      gAtk[i]! += rh; gDef[j]! += rh; gAtk[j]! += ra; gDef[i]! += ra;
+      hAtk[i]! += wm * lh; hDef[j]! += wm * lh; hAtk[j]! += wm * la; hDef[i]! += wm * la;
+      gMu += rh + ra; hMu += wm * (lh + la);
+      if (!neu[m]) { gHome += rh; hHome += wm * lh; }
+    }
+    for (let k = 0; k < N; k++) {
+      if (hAtk[k]! > 0) atk[k]! += damp * gAtk[k]! / hAtk[k]!;
+      if (hDef[k]! > 0) def[k]! += damp * gDef[k]! / hDef[k]!;
+    }
+    if (hHome > 0) logHome += damp * gHome / hHome;
+    if (hMu > 0) mu += damp * gMu / hMu;
+    // identificabilidad: atk y def a media 0 (geomean exp = 1.0); el nivel vive en μ.
+    let ma = 0, md = 0;
+    for (let k = 0; k < N; k++) { ma += atk[k]!; md += def[k]!; }
+    ma /= N; md /= N;
+    for (let k = 0; k < N; k++) { atk[k]! -= ma; def[k]! -= md; }
+    mu += ma + md; // reabsorbe el nivel removido por el centrado en μ
+  }
+
+  // log-lik final (con la corrección Dixon-Coles, para reportar). weightedLogLik
+  // ya respeta neutral por partido.
+  const p: Params = { atk: Array.from(atk), def: Array.from(def), logHome, mu };
+  const wArr = Array.from(w);
+
   return {
-    attack: new Map(teams.map((t, i) => [t, Math.exp(p.atk[i]!)])),
-    defense: new Map(teams.map((t, i) => [t, Math.exp(p.def[i]!)])),
-    homeAdvantage: Math.exp(p.logHome),
+    attack: new Map(teams.map((t, i) => [t, Math.exp(atk[i]!)])),
+    defense: new Map(teams.map((t, i) => [t, Math.exp(def[i]!)])),
+    homeAdvantage: Math.exp(logHome),
+    base: Math.exp(mu),
     rho,
-    logLik: llAt(p),
+    logLik: weightedLogLik(p, idx, matches, wArr, rho),
     iterations,
   };
 }

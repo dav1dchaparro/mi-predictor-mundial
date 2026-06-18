@@ -118,6 +118,15 @@ function migrate(db: Database.Database): void {
   for (const [name, type] of Object.entries(add)) {
     if (!cols.has(name)) db.exec(`ALTER TABLE odds ADD COLUMN ${name} ${type}`);
   }
+
+  // matches_history: neutral (sin ventaja local) y tournament (peso por importancia).
+  const hcols = new Set(
+    (db.prepare("PRAGMA table_info(matches_history)").all() as { name: string }[]).map((c) => c.name),
+  );
+  const hadd: Record<string, string> = { neutral: "INTEGER DEFAULT 0", tournament: "TEXT" };
+  for (const [name, type] of Object.entries(hadd)) {
+    if (!hcols.has(name)) db.exec(`ALTER TABLE matches_history ADD COLUMN ${name} ${type}`);
+  }
 }
 
 export function getDb(path = "data/mundial.db"): Database.Database {

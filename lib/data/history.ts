@@ -34,6 +34,94 @@ export interface HistoryRow {
   played_at: string;
   competition?: string;
   league_id?: number;
+  /** 1 si se jugó en cancha neutral (sin ventaja local). */
+  neutral?: number;
+  tournament?: string;
+}
+
+// ───────────────────────── Ingesta desde CSV abierto ──────────────────────────
+// Dataset martj42/international_results: resultados de TODAS las selecciones desde
+// 1872 (date,home_team,away_team,home_score,away_score,tournament,city,country,
+// neutral). No requiere API key. Mucho mejor para el Mundial que ligas de clubes:
+// son partidos de selecciones, con el flag `neutral` que necesitamos para separar
+// la ventaja de local (clave en sedes neutrales del Mundial 2026).
+
+/** Hash FNV-1a 32-bit estable para sintetizar un api_fixture_id (dedup idempotente). */
+function fnv1a(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+
+/** Parte una línea CSV respetando comillas dobles. */
+function splitCsvLine(line: string): string[] {
+  const out: string[] = [];
+  let cur = "", inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i]!;
+    if (inQ) {
+      if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else inQ = false; }
+      else cur += c;
+    } else if (c === '"') inQ = true;
+    else if (c === ",") { out.push(cur); cur = ""; }
+    else cur += c;
+  }
+  out.push(cur);
+  return out;
+}
+
+export interface CsvParseOptions {
+  /** descarta partidos antes de esta fecha ISO (YYYY-MM-DD). Default: sin filtro. */
+  since?: string;
+}
+
+/**
+ * Parsea el CSV de resultados internacionales a HistoryRow[]. Puro y testeable.
+ * Descarta filas sin marcador (NA, p.ej. fixtures futuros) y anteriores a `since`.
+ */
+export function parseInternationalCsv(csv: string, opts: CsvParseOptions = {}): HistoryRow[] {
+  const lines = csv.split(/\r?\n/);
+  const header = splitCsvLine(lines[0] ?? "");
+  const idx = (name: string) => header.indexOf(name);
+  const iDate = idx("date"), iHome = idx("home_team"), iAway = idx("away_team");
+  const iHs = idx("home_score"), iAs = idx("away_score");
+  const iTour = idx("tournament"), iNeu = idx("neutral");
+  const out: HistoryRow[] = [];
+  for (let l = 1; l < lines.length; l++) {
+    const line = lines[l];
+    if (!line) continue;
+    const f = splitCsvLine(line);
+    const date = f[iDate], home = f[iHome], away = f[iAway];
+    const hs = Number(f[iHs]), as = Number(f[iAs]);
+    if (!date || !home || !away) continue;
+    if (!Number.isFinite(hs) || !Number.isFinite(as)) continue; // "NA" -> NaN
+    if (opts.since && date < opts.since) continue;
+    const tournament = iTour >= 0 ? f[iTour] : undefined;
+    const neutral = iNeu >= 0 && /^true$/i.test(f[iNeu] ?? "") ? 1 : 0;
+    out.push({
+      api_fixture_id: fnv1a(`${date}|${home}|${away}`),
+      home_name: home, away_name: away,
+      home_goals: hs, away_goals: as,
+      played_at: `${date}T00:00:00.000Z`,
+      competition: tournament, tournament, neutral,
+    });
+  }
+  return out;
+}
+
+/** Upsertea HistoryRow[] en matches_history (dedup por api_fixture_id). Devuelve cuántos. */
+export function ingestHistoryRows(db: Database.Database, rows: HistoryRow[]): number {
+  const upsert = db.prepare(
+    `INSERT INTO matches_history (api_fixture_id, home_name, away_name, home_goals, away_goals, played_at, competition, league_id, neutral, tournament)
+     VALUES (@api_fixture_id, @home_name, @away_name, @home_goals, @away_goals, @played_at, @competition, @league_id, @neutral, @tournament)
+     ON CONFLICT(api_fixture_id) DO UPDATE SET home_goals=excluded.home_goals, away_goals=excluded.away_goals, played_at=excluded.played_at, neutral=excluded.neutral, tournament=excluded.tournament`,
+  );
+  let n = 0;
+  const tx = db.transaction((rs: HistoryRow[]) => {
+    for (const r of rs) { upsert.run({ league_id: null, neutral: 0, tournament: null, competition: null, ...r }); n++; }
+  });
+  tx(rows);
+  return n;
 }
 
 // Forma del item de /fixtures en API-Football (solo lo que usamos).
@@ -97,7 +185,7 @@ export async function ingestHistory(
   return { ingested, calls, perComp };
 }
 
-interface HistRow { home_name: string; away_name: string; home_goals: number; away_goals: number; played_at: string }
+interface HistRow { home_name: string; away_name: string; home_goals: number; away_goals: number; played_at: string; neutral?: number }
 
 /**
  * Carga TODO matches_history como FitMatch[], mapeando nombres crudos a normalizados
@@ -106,12 +194,12 @@ interface HistRow { home_name: string; away_name: string; home_goals: number; aw
  * El re-centrado al campo del Mundial se hace luego en scripts/fit.ts.
  */
 export function loadHistoryForFit(db: Database.Database, nowIso: string): FitMatch[] {
-  const rows = db.prepare("SELECT home_name, away_name, home_goals, away_goals, played_at FROM matches_history").all() as HistRow[];
+  const rows = db.prepare("SELECT home_name, away_name, home_goals, away_goals, played_at, neutral FROM matches_history").all() as HistRow[];
   const nowMs = Date.parse(nowIso);
   const out: FitMatch[] = [];
   for (const r of rows) {
     const daysAgo = Math.max(0, (nowMs - Date.parse(r.played_at)) / 86_400_000);
-    out.push({ home: resolve(r.home_name), away: resolve(r.away_name), homeGoals: r.home_goals, awayGoals: r.away_goals, daysAgo });
+    out.push({ home: resolve(r.home_name), away: resolve(r.away_name), homeGoals: r.home_goals, awayGoals: r.away_goals, daysAgo, neutral: r.neutral === 1 });
   }
   return out;
 }

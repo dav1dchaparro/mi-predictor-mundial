@@ -65,7 +65,7 @@ export function runBacktest(
     const { lambdaHome, lambdaAway } = computeLambdas({
       home, away, venue: { homeIsHost: m.home === host },
     });
-    const sm = buildScoreMatrix(lambdaHome, lambdaAway, { rho: -0.14 });
+    const sm = buildScoreMatrix(lambdaHome, lambdaAway, { rho: -0.05, nu: 1.10 });
 
     // pick 1X2 = resultado más probable
     const r = result1X2(sm);

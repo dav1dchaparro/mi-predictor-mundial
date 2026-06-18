@@ -6,9 +6,9 @@ import { STRATEGY_LABELS, type ScorelineStrategy } from "@/lib/model";
 
 // Una línea por estrategia: descripción corta para el menú comparativo.
 const STRATEGY_HINT: Record<ScorelineStrategy, string> = {
-  "goles-esperados": "redondea los goles esperados — realista",
-  "ev-optimo": "maximiza puntos esperados — tiende a 1-0",
-  "mas-probable": "marcador más probable — tiende a 1-1",
+  "mas-probable": "el más probable de la matriz — óptimo para clavar el exacto (13.7% backtest)",
+  "ev-optimo": "maximiza puntos de polla — tiende a 1-0",
+  "goles-esperados": "redondea los goles esperados — realista pero clava menos",
   "condicional-1x2": "resultado 1X2 más probable + su marcador modal",
 };
 

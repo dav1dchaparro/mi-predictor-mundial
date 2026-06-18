@@ -12,6 +12,25 @@ export function poissonPmf(k: number, lambda: number): number {
   return Math.exp(logP);
 }
 
+/** log(k!) por suma directa (k chico: goles). */
+function logFactorial(k: number): number {
+  let s = 0;
+  for (let i = 2; i <= k; i++) s += Math.log(i);
+  return s;
+}
+
+/**
+ * Peso NO normalizado de k goles bajo Conway-Maxwell-Poisson: w_k = λ^k / (k!)^ν.
+ * ν=1 recupera Poisson (salvo la constante e^{-λ}, que se cancela al renormalizar
+ * la matriz). ν<1 = sobredispersión (cola más pesada), ν>1 = sub-dispersión
+ * (más concentrado). Permite ajustar la dispersión de goles que el Poisson fija.
+ */
+export function cmpWeight(k: number, lambda: number, nu: number): number {
+  if (k < 0) return 0;
+  if (lambda <= 0) return k === 0 ? 1 : 0;
+  return Math.exp(k * Math.log(lambda) - nu * logFactorial(k));
+}
+
 /**
  * Factor de corrección Dixon-Coles (tau) para los cuatro marcadores bajos.
  * rho < 0 sube empates 0-0 / 1-1 y baja 1-0 / 0-1, replicando lo observado.
@@ -43,6 +62,8 @@ export interface ScoreMatrixOptions {
   maxGoals?: number;
   /** parámetro Dixon-Coles. Típico [-0.15, -0.03]. 0 = Poisson puro. */
   rho?: number;
+  /** dispersión Conway-Maxwell-Poisson. 1 = Poisson; <1 sobredisp.; >1 sub-disp. */
+  nu?: number;
 }
 
 /**
@@ -56,15 +77,20 @@ export function buildScoreMatrix(
 ): ScoreMatrix {
   const maxGoals = opts.maxGoals ?? 8;
   const rho = opts.rho ?? -0.05;
+  const nu = opts.nu ?? 1;
+
+  // Marginales (pesos no normalizados): Poisson si nu=1, CMP si no.
+  const wh = Array.from({ length: maxGoals + 1 }, (_, k) => cmpWeight(k, lambdaHome, nu));
+  const wa = Array.from({ length: maxGoals + 1 }, (_, k) => cmpWeight(k, lambdaAway, nu));
 
   const matrix: number[][] = [];
   let total = 0;
 
   for (let h = 0; h <= maxGoals; h++) {
     const row: number[] = [];
-    const ph = poissonPmf(h, lambdaHome);
+    const ph = wh[h]!;
     for (let a = 0; a <= maxGoals; a++) {
-      const pa = poissonPmf(a, lambdaAway);
+      const pa = wa[a]!;
       const tau = dixonColesTau(h, a, lambdaHome, lambdaAway, rho);
       const p = ph * pa * Math.max(0, tau); // tau no puede volver la prob negativa
       row.push(p);
