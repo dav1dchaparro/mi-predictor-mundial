@@ -2,6 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getFixtureSummary, getMatchPrediction, getFixtures } from "@/lib/db/queries";
 import { Panel, ProbBar, BigStat, pct } from "@/components/ui";
+import { STRATEGY_LABELS, type ScorelineStrategy } from "@/lib/model";
+
+// Una línea por estrategia: descripción corta para el menú comparativo.
+const STRATEGY_HINT: Record<ScorelineStrategy, string> = {
+  "goles-esperados": "redondea los goles esperados — realista",
+  "ev-optimo": "maximiza puntos esperados — tiende a 1-0",
+  "mas-probable": "marcador más probable — tiende a 1-1",
+  "condicional-1x2": "resultado 1X2 más probable + su marcador modal",
+};
 
 // Export estático: pre-genera una página por partido y no admite otros params.
 export const dynamicParams = false;
@@ -77,8 +86,8 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
             )}
           </div>
           <p className="mt-4 border-t border-line pt-3 text-xs leading-relaxed text-muted">
-            Marcador que maximiza los puntos esperados de tu prode (no el más
-            probable). {srcLabel[rec.source]}.
+            Estrategia <span className="text-acid">{STRATEGY_LABELS[pred.scorelineStrategy]}</span>:
+            {" "}{STRATEGY_HINT[pred.scorelineStrategy]}. {srcLabel[rec.source]}.
           </p>
           {ref && (
             <div className="mt-2 flex items-center justify-between border-t border-line pt-3 text-xs">
@@ -88,6 +97,33 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
               </span>
             </div>
           )}
+        </Panel>
+
+        {/* Menú comparativo: qué marcador da cada estrategia */}
+        <Panel title="Marcador según la estrategia">
+          <div className="space-y-2">
+            {(Object.keys(pred.scorelineOptions) as ScorelineStrategy[]).map((key) => {
+              const s = pred.scorelineOptions[key];
+              const active = key === pred.scorelineStrategy;
+              return (
+                <div
+                  key={key}
+                  className={`flex items-center justify-between border px-3 py-2 ${active ? "border-acid" : "border-line"}`}
+                >
+                  <span className="min-w-0">
+                    <span className={`text-sm ${active ? "text-acid" : "text-chalk"}`}>
+                      {STRATEGY_LABELS[key]}{active ? " ·" : ""}
+                    </span>
+                    <span className="block uptick text-[10px] text-muted">{STRATEGY_HINT[key]}</span>
+                  </span>
+                  <span className="flex items-center gap-3 pl-3">
+                    <span className={`tnum text-lg ${active ? "text-acid" : "text-chalk"}`}>{s.home}-{s.away}</span>
+                    <span className="tnum w-12 text-right text-[10px] text-muted">{pct(s.prob)}</span>
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </Panel>
 
         {/* Top 5 marcadores exactos */}

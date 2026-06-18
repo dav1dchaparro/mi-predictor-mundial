@@ -4,8 +4,10 @@
 
 import {
   computeLambdas, buildScoreMatrix, deriveAllMarkets, optimalPick,
+  pickScoreline, allScorelines, DEFAULT_STRATEGY,
   cardsMarket, cornersMarket, marketLambdas, blendLambdas, anchorResultLambdas,
   type AllMarkets, type PollaRules, type Odds1X2, type OverUnderOdds,
+  type ScorelineStrategy, type ScorePick,
 } from "../model/index.js";
 import type { TeamStrength } from "../model/lambda.js";
 
@@ -19,6 +21,8 @@ export interface MatchContext {
   cards?: { homeAvg: number; awayAvg: number; intensity?: number };
   corners?: { homeAvg: number; awayAvg: number };
   pollaRules?: PollaRules;
+  /** Estrategia para el marcador recomendado. Default: goles-esperados (realista). */
+  scorelineStrategy?: ScorelineStrategy;
   /**
    * Cuotas de mercado opcionales (Betano). Si llegan, se anclan al modelo.
    * overUnder es opcional: con él el anclaje es completo; sin él se ancla solo
@@ -48,6 +52,9 @@ export interface MatchPrediction {
   pollaPick?: { home: number; away: number; expectedPoints: number; mostLikely: { home: number; away: number } };
   /** Marcador recomendado para el prode. SIEMPRE lo decide el modelo. */
   recommended: { home: number; away: number; prob?: number; source: PickSource };
+  /** Estrategia usada para `recommended` y el menú con TODAS las estrategias. */
+  scorelineStrategy: ScorelineStrategy;
+  scorelineOptions: Record<ScorelineStrategy, ScorePick>;
   /** Cuotas de mercado usadas para anclar (para mostrarlas en la UI). */
   marketUsed?: { home: number; draw: number; away: number; ouOver?: number; ouUnder?: number };
   /** Marcador exacto que más cree Betano (lo que menos paga). Solo referencia. */
@@ -106,13 +113,17 @@ export function predictMatch(ctx: MatchContext): MatchPrediction {
   const { best } = optimalPick(sm, rules);
   const mostLikely = markets.topScores[0]!;
 
-  // El marcador a jugar es el que MAXIMIZA los puntos esperados de la polla, no la
-  // moda de la matriz. Con favoritos moderados (lambda ~1.3-1.9) la moda colapsa a
-  // 1-1 por el boost Dixon-Coles aunque el 1X2 favorezca claramente a un equipo;
-  // el óptimo de puntos esperados sí respeta ese favoritismo. El más probable
-  // queda en topScores y en pollaPick.mostLikely como referencia. Betano es input.
+  // Menú de estrategias de marcador. El recomendado usa la estrategia elegida
+  // (default "goles-esperados"): round(λ) por equipo, que produce marcadores
+  // realistas (2-1/1-1/1-2) alineados con los ~2.55 goles que el modelo espera.
+  // El EV-óptimo —que maximiza puntos esperados pero colapsa a 1-0/0-1 y predice
+  // ~1.2 goles/pp— queda disponible en scorelineOptions y en pollaPick. La moda y
+  // la condicional al 1X2 también quedan a mano. Betano sigue siendo solo input.
+  const strategy = ctx.scorelineStrategy ?? DEFAULT_STRATEGY;
+  const scorelineOptions = allScorelines(sm, rules);
+  const pick = pickScoreline(sm, rules, strategy);
   const recommended: MatchPrediction["recommended"] = {
-    home: best.home, away: best.away, prob: best.exactProb,
+    home: pick.home, away: pick.away, prob: pick.prob,
     source: marketAnchored ? "market-anchored" : "model",
   };
 
@@ -135,6 +146,8 @@ export function predictMatch(ctx: MatchContext): MatchPrediction {
     marketAnchored,
     markets,
     recommended,
+    scorelineStrategy: strategy,
+    scorelineOptions,
     pollaPick: {
       home: best.home,
       away: best.away,

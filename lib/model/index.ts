@@ -1,6 +1,7 @@
 export * from "./poisson.js";
 export * from "./markets.js";
 export * from "./polla.js";
+export * from "./scoreline.js";
 export * from "./lambda.js";
 export * from "./montecarlo.js";
 export * from "./rng.js";

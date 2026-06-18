@@ -1,7 +1,14 @@
-// Calendario REAL de la fase de grupos del Mundial 2026: los 72 partidos con su
-// fecha, hora y jornada exactas. No se inventan sedes (no son públicas aún), así
-// que la predicción usa rating + ventaja de anfitrión, sin ajuste de altitud.
-// Idempotente por (home, away, stage).
+// Calendario REAL de la fase de grupos del Mundial 2026 (11–27 jun): los 72
+// partidos con su fecha, hora y SEDE oficiales. Cada jornada se reparte en varios
+// días (Fecha 1: 11–17 jun · Fecha 2: 18–23 jun · Fecha 3: 24–27 jun), ~4-6
+// partidos por día, como el cronograma de FIFA.
+//
+// Las horas están en HORA DEL ESTE (ET, UTC−4 en junio), que es la referencia del
+// fixture oficial; se guardan convertidas a UTC y la UI las re-muestra en ET.
+// Local/visitante se conserva como en el seed original para no alterar las
+// predicciones (la ventaja de local ya está calibrada sobre esa asignación).
+// Idempotente por (home, away, stage): si el partido ya existe, ACTUALIZA fecha y
+// sede; si no, lo inserta.
 
 import type Database from "better-sqlite3";
 
@@ -21,50 +28,91 @@ const CODE: Record<string, string> = {
   ENG: "Inglaterra", CRO: "Croacia", GHA: "Ghana", PAN: "Panamá",
 };
 
-// [grupo, fecha (YYYY-MM-DD), hora (HH:MM), local, visitante]
-type Fx = [string, string, string, string, string];
+// [grupo, fecha (YYYY-MM-DD), hora ET (HH:MM), local, visitante, sede]
+type Fx = [string, string, string, string, string, string];
 
 const FIXTURES: Fx[] = [
-  // Jornada 1
-  ["A", "2026-06-11", "00:00", "MEX", "RSA"], ["A", "2026-06-11", "03:00", "KOR", "CZE"],
-  ["I", "2026-06-11", "00:00", "FRA", "SEN"], ["I", "2026-06-11", "03:00", "IRQ", "NOR"],
-  ["B", "2026-06-11", "03:00", "CAN", "BIH"], ["B", "2026-06-11", "06:00", "QAT", "SUI"],
-  ["J", "2026-06-11", "03:00", "ARG", "ALG"], ["J", "2026-06-11", "06:00", "AUT", "JOR"],
-  ["C", "2026-06-11", "06:00", "BRA", "MAR"], ["C", "2026-06-11", "09:00", "HAI", "SCO"],
-  ["K", "2026-06-11", "06:00", "POR", "COD"], ["K", "2026-06-11", "09:00", "UZB", "COL"],
-  ["D", "2026-06-11", "09:00", "USA", "PAR"], ["D", "2026-06-11", "12:00", "AUS", "TUR"],
-  ["L", "2026-06-11", "09:00", "ENG", "CRO"], ["L", "2026-06-11", "12:00", "GHA", "PAN"],
-  ["E", "2026-06-11", "12:00", "GER", "CUW"], ["E", "2026-06-11", "15:00", "CIV", "ECU"],
-  ["F", "2026-06-11", "15:00", "NED", "JPN"], ["F", "2026-06-11", "18:00", "SWE", "TUN"],
-  ["G", "2026-06-11", "18:00", "BEL", "EGY"], ["G", "2026-06-11", "21:00", "IRN", "NZL"],
-  ["H", "2026-06-11", "21:00", "ESP", "CPV"], ["H", "2026-06-12", "00:00", "KSA", "URU"],
-  // Jornada 2
-  ["A", "2026-06-18", "00:00", "MEX", "KOR"], ["A", "2026-06-18", "03:00", "RSA", "CZE"],
-  ["B", "2026-06-18", "03:00", "CAN", "QAT"], ["B", "2026-06-18", "06:00", "BIH", "SUI"],
-  ["I", "2026-06-18", "03:00", "FRA", "IRQ"], ["I", "2026-06-18", "06:00", "SEN", "NOR"],
-  ["C", "2026-06-18", "06:00", "BRA", "HAI"], ["C", "2026-06-18", "09:00", "MAR", "SCO"],
-  ["J", "2026-06-18", "06:00", "ARG", "AUT"], ["J", "2026-06-18", "09:00", "ALG", "JOR"],
-  ["D", "2026-06-18", "09:00", "USA", "AUS"], ["D", "2026-06-18", "12:00", "PAR", "TUR"],
-  ["K", "2026-06-18", "09:00", "POR", "UZB"], ["K", "2026-06-18", "12:00", "COD", "COL"],
-  ["E", "2026-06-18", "12:00", "GER", "CIV"], ["E", "2026-06-18", "15:00", "CUW", "ECU"],
-  ["L", "2026-06-18", "12:00", "ENG", "GHA"], ["L", "2026-06-18", "15:00", "CRO", "PAN"],
-  ["F", "2026-06-18", "15:00", "NED", "SWE"], ["F", "2026-06-18", "18:00", "JPN", "TUN"],
-  ["G", "2026-06-18", "18:00", "BEL", "IRN"], ["G", "2026-06-18", "21:00", "EGY", "NZL"],
-  ["H", "2026-06-18", "21:00", "ESP", "KSA"], ["H", "2026-06-19", "00:00", "CPV", "URU"],
-  // Jornada 3
-  ["A", "2026-06-25", "00:00", "MEX", "CZE"], ["A", "2026-06-25", "00:00", "RSA", "KOR"],
-  ["I", "2026-06-25", "00:00", "FRA", "NOR"], ["I", "2026-06-25", "00:00", "SEN", "IRQ"],
-  ["B", "2026-06-25", "03:00", "CAN", "SUI"], ["B", "2026-06-25", "03:00", "BIH", "QAT"],
-  ["J", "2026-06-25", "03:00", "ARG", "JOR"], ["J", "2026-06-25", "03:00", "ALG", "AUT"],
-  ["C", "2026-06-25", "06:00", "BRA", "SCO"], ["C", "2026-06-25", "06:00", "MAR", "HAI"],
-  ["K", "2026-06-25", "06:00", "POR", "COL"], ["K", "2026-06-25", "06:00", "COD", "UZB"],
-  ["D", "2026-06-25", "09:00", "USA", "TUR"], ["D", "2026-06-25", "09:00", "PAR", "AUS"],
-  ["L", "2026-06-25", "09:00", "ENG", "PAN"], ["L", "2026-06-25", "09:00", "CRO", "GHA"],
-  ["E", "2026-06-25", "12:00", "GER", "ECU"], ["E", "2026-06-25", "12:00", "CUW", "CIV"],
-  ["F", "2026-06-25", "15:00", "NED", "TUN"], ["F", "2026-06-25", "15:00", "JPN", "SWE"],
-  ["G", "2026-06-25", "18:00", "BEL", "NZL"], ["G", "2026-06-25", "18:00", "EGY", "IRN"],
-  ["H", "2026-06-25", "21:00", "ESP", "URU"], ["H", "2026-06-25", "21:00", "CPV", "KSA"],
+  // ── Fecha 1 (11–17 jun) ─────────────────────────────────────────────
+  ["A", "2026-06-11", "15:00", "MEX", "RSA", "Ciudad de México"],
+  ["A", "2026-06-11", "21:00", "KOR", "CZE", "Guadalajara"],
+  ["D", "2026-06-12", "21:00", "USA", "PAR", "Los Ángeles"],
+  ["B", "2026-06-12", "15:00", "CAN", "BIH", "Toronto"],
+  ["B", "2026-06-13", "15:00", "QAT", "SUI", "San Francisco"],
+  ["C", "2026-06-13", "15:00", "BRA", "MAR", "Nueva York/NJ"],
+  ["C", "2026-06-13", "21:00", "HAI", "SCO", "Boston"],
+  ["D", "2026-06-13", "00:00", "AUS", "TUR", "Vancouver"],
+  ["E", "2026-06-14", "13:00", "GER", "CUW", "Houston"],
+  ["E", "2026-06-14", "19:00", "CIV", "ECU", "Filadelfia"],
+  ["F", "2026-06-14", "16:00", "NED", "JPN", "Dallas"],
+  ["F", "2026-06-14", "21:00", "SWE", "TUN", "Monterrey"],
+  ["G", "2026-06-15", "15:00", "BEL", "EGY", "Seattle"],
+  ["G", "2026-06-15", "21:00", "IRN", "NZL", "Los Ángeles"],
+  ["H", "2026-06-15", "12:00", "ESP", "CPV", "Atlanta"],
+  ["H", "2026-06-15", "18:00", "KSA", "URU", "Miami"],
+  ["I", "2026-06-16", "15:00", "FRA", "SEN", "Nueva York/NJ"],
+  ["I", "2026-06-16", "18:00", "IRQ", "NOR", "Boston"],
+  ["J", "2026-06-16", "21:00", "ARG", "ALG", "Kansas City"],
+  ["J", "2026-06-17", "00:00", "AUT", "JOR", "San Francisco"],
+  ["K", "2026-06-17", "13:00", "POR", "COD", "Houston"],
+  ["K", "2026-06-17", "22:00", "UZB", "COL", "Ciudad de México"],
+  ["L", "2026-06-17", "16:00", "ENG", "CRO", "Dallas"],
+  ["L", "2026-06-17", "19:00", "GHA", "PAN", "Toronto"],
+  // ── Fecha 2 (18–23 jun) ─────────────────────────────────────────────
+  ["A", "2026-06-18", "12:00", "RSA", "CZE", "Atlanta"],
+  ["A", "2026-06-18", "21:00", "MEX", "KOR", "Guadalajara"],
+  ["B", "2026-06-18", "15:00", "BIH", "SUI", "Los Ángeles"],
+  ["B", "2026-06-18", "21:00", "CAN", "QAT", "Vancouver"],
+  ["C", "2026-06-19", "18:00", "MAR", "SCO", "Boston"],
+  ["C", "2026-06-19", "21:00", "BRA", "HAI", "Filadelfia"],
+  ["D", "2026-06-19", "15:00", "USA", "AUS", "Seattle"],
+  ["D", "2026-06-19", "21:00", "PAR", "TUR", "San Francisco"],
+  ["E", "2026-06-20", "16:00", "GER", "CIV", "Toronto"],
+  ["E", "2026-06-20", "20:00", "CUW", "ECU", "Kansas City"],
+  ["F", "2026-06-20", "13:00", "NED", "SWE", "Houston"],
+  ["F", "2026-06-21", "00:00", "JPN", "TUN", "Monterrey"],
+  ["G", "2026-06-21", "15:00", "BEL", "IRN", "Los Ángeles"],
+  ["G", "2026-06-21", "21:00", "EGY", "NZL", "Vancouver"],
+  ["H", "2026-06-21", "12:00", "ESP", "KSA", "Atlanta"],
+  ["H", "2026-06-21", "18:00", "CPV", "URU", "Miami"],
+  ["I", "2026-06-22", "17:00", "FRA", "IRQ", "Filadelfia"],
+  ["I", "2026-06-22", "20:00", "SEN", "NOR", "Nueva York/NJ"],
+  ["J", "2026-06-22", "13:00", "ARG", "AUT", "Dallas"],
+  ["J", "2026-06-22", "23:00", "ALG", "JOR", "San Francisco"],
+  ["K", "2026-06-23", "13:00", "POR", "UZB", "Houston"],
+  ["K", "2026-06-23", "22:00", "COD", "COL", "Guadalajara"],
+  ["L", "2026-06-23", "16:00", "ENG", "GHA", "Boston"],
+  ["L", "2026-06-23", "19:00", "CRO", "PAN", "Toronto"],
+  // ── Fecha 3 (24–27 jun) — pares simultáneos por grupo ───────────────
+  ["A", "2026-06-24", "21:00", "MEX", "CZE", "Ciudad de México"],
+  ["A", "2026-06-24", "21:00", "RSA", "KOR", "Monterrey"],
+  ["B", "2026-06-24", "21:00", "CAN", "SUI", "Vancouver"],
+  ["B", "2026-06-24", "15:00", "BIH", "QAT", "Seattle"],
+  ["C", "2026-06-24", "18:00", "BRA", "SCO", "Miami"],
+  ["C", "2026-06-24", "18:00", "MAR", "HAI", "Atlanta"],
+  ["D", "2026-06-25", "22:00", "USA", "TUR", "Los Ángeles"],
+  ["D", "2026-06-25", "22:00", "PAR", "AUS", "San Francisco"],
+  ["E", "2026-06-25", "16:00", "GER", "ECU", "Nueva York/NJ"],
+  ["E", "2026-06-25", "16:00", "CUW", "CIV", "Filadelfia"],
+  ["F", "2026-06-25", "19:00", "NED", "TUN", "Kansas City"],
+  ["F", "2026-06-25", "19:00", "JPN", "SWE", "Dallas"],
+  ["G", "2026-06-26", "23:00", "BEL", "NZL", "Vancouver"],
+  ["G", "2026-06-26", "23:00", "EGY", "IRN", "Seattle"],
+  ["H", "2026-06-26", "20:00", "ESP", "URU", "Guadalajara"],
+  ["H", "2026-06-26", "20:00", "CPV", "KSA", "Houston"],
+  ["I", "2026-06-26", "15:00", "FRA", "NOR", "Boston"],
+  ["I", "2026-06-26", "15:00", "SEN", "IRQ", "Toronto"],
+  ["J", "2026-06-27", "22:00", "ARG", "JOR", "Dallas"],
+  ["J", "2026-06-27", "22:00", "ALG", "AUT", "Kansas City"],
+  ["K", "2026-06-27", "19:00", "POR", "COL", "Miami"],
+  ["K", "2026-06-27", "19:00", "COD", "UZB", "Atlanta"],
+  ["L", "2026-06-27", "17:00", "ENG", "PAN", "Nueva York/NJ"],
+  ["L", "2026-06-27", "17:00", "CRO", "GHA", "Filadelfia"],
 ];
+
+// ET (UTC−4 en junio) -> instante UTC ISO.
+function etToUtcIso(date: string, timeET: string): string {
+  return new Date(`${date}T${timeET}:00-04:00`).toISOString();
+}
 
 export function seedFixtures(db: Database.Database): number {
   const idByName = new Map<string, number>(
@@ -72,22 +120,24 @@ export function seedFixtures(db: Database.Database): number {
       .map((t) => [t.name, t.id]),
   );
 
-  const insert = db.prepare(
+  const upd = db.prepare(
+    `UPDATE fixtures SET kickoff=@kickoff, venue=@venue
+       WHERE home_team_id=@home AND away_team_id=@away AND stage='group'`,
+  );
+  const ins = db.prepare(
     `INSERT INTO fixtures (home_team_id, away_team_id, kickoff, stage, venue, altitude_m, temp_c, status)
-     SELECT @home, @away, @kickoff, 'group', NULL, NULL, NULL, 'scheduled'
-     WHERE NOT EXISTS (
-       SELECT 1 FROM fixtures WHERE home_team_id=@home AND away_team_id=@away AND stage='group'
-     )`,
+     VALUES (@home, @away, @kickoff, 'group', @venue, NULL, NULL, 'scheduled')`,
   );
 
   let count = 0;
   const tx = db.transaction(() => {
-    for (const [, date, time, hc, ac] of FIXTURES) {
+    for (const [, date, timeET, hc, ac, venue] of FIXTURES) {
       const home = idByName.get(CODE[hc]!);
       const away = idByName.get(CODE[ac]!);
       if (!home || !away) continue; // equipo no sembrado: se salta sin romper
-      const kickoff = `${date}T${time}:00.000Z`;
-      count += insert.run({ home, away, kickoff }).changes;
+      const kickoff = etToUtcIso(date, timeET);
+      const r = upd.run({ home, away, kickoff, venue });
+      if (r.changes === 0) { ins.run({ home, away, kickoff, venue }); count++; }
     }
   });
   tx();
