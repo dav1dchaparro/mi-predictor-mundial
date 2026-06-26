@@ -71,11 +71,13 @@ const DEFAULT_POLLA: PollaRules = { exactScore: 5, correctResult: 2, goalDiffere
 // Parámetros de la matriz de marcadores, calibrados para MAXIMIZAR aciertos de
 // marcador exacto (scripts/tuneExact.ts sobre histórico real de selecciones).
 const SCORE_RHO = -0.05; // corrección Dixon-Coles (suave; -0.14 era excesivo)
-// nu subido 1.10→1.15 tras el backtest in-torneo (scripts/tuneWC.ts) sobre los 47
-// partidos reales del Mundial 2026: la sub-dispersión un poco mayor afila la moda
-// (los marcadores internacionales concentran más de lo que asume Poisson). 1.20
-// daba el óptimo en muestra pero sobreajusta a 47 partidos; 1.15 es el punto seguro.
-const SCORE_NU = 1.15;   // sub-dispersión Conway-Maxwell-Poisson (1 = Poisson)
+// nu=1.10: valor validado OUT-OF-SAMPLE sobre el holdout temporal pre-Mundial
+// (scripts/tuneExact.ts, 2039 partidos). NOTA HONESTA: un tuning sobre los 48
+// partidos del Mundial daba nu≈1.20-1.25 con mayor "acierto", pero eso es
+// SOBREAJUSTE in-sample (se elige el parámetro con los mismos datos con que se
+// mide) — auditoría adversarial 24-jun. La tasa de exacto honesta es ~9-11%, no
+// 13-18%. No re-tunear hiperparámetros con partidos del torneo en curso.
+const SCORE_NU = 1.10;   // sub-dispersión Conway-Maxwell-Poisson (1 = Poisson)
 
 /** "1-0" -> {home:1, away:0}. Devuelve null si no parsea. */
 function parseScore(s: string): { home: number; away: number } | null {

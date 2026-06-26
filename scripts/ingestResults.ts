@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import { getDb } from "../lib/db/schema.js";
 import { seedTeams } from "../lib/data/seed.js";
 import { seedFixtures } from "../lib/data/seedFixtures.js";
-import { ingestHistoryRows } from "../lib/data/history.js";
+import { ingestHistoryRows, type HistoryRow } from "../lib/data/history.js";
 import { resolve, norm } from "../lib/data/teamNames.js";
 
 interface RawMatch { group: string; date: string; home: string; hg: number; away: string; ag: number }
@@ -43,7 +43,7 @@ const setFinished = db.prepare("UPDATE fixtures SET status='finished', home_goal
 const del = db.prepare("DELETE FROM matches_history WHERE played_at >= '2026-06-11' AND tournament = 'FIFA World Cup'");
 
 let matched = 0, unmatched: string[] = [];
-const historyRows = [];
+const historyRows: HistoryRow[] = [];
 const tx = db.transaction(() => {
   const removed = del.run().changes;
   if (removed) console.log(`[ingestResults] borradas ${removed} filas previas de Mundial 2026 (dedup).`);

@@ -35,7 +35,7 @@ for (const r of rows) {
   if (isDiff) diff++;
   for (const s of stratNames) {
     const o = p.scorelineOptions?.[s];
-    if (o && o.home === r.hg && o.away === r.ag) stratExact[s]++;
+    if (o && o.home === r.hg && o.away === r.ag) stratExact[s] = (stratExact[s] ?? 0) + 1;
   }
   lines.push(
     `${(isExact ? "✓EXACTO" : isRes ? "·result" : "  miss ").padEnd(8)} ${r.h} vs ${r.a}`.padEnd(52) +
@@ -52,7 +52,7 @@ console.log(`  Marcador EXACTO : ${exact}/${n} = ${pct(exact, n)}`);
 console.log(`  Resultado 1X2   : ${res}/${n} = ${pct(res, n)}`);
 console.log(`  Diferencia goles: ${diff}/${n} = ${pct(diff, n)}`);
 console.log(`\n--- ¿Qué habría clavado CADA estrategia (en estos mismos partidos)? ---`);
-for (const s of stratNames) console.log(`  ${s.padEnd(18)} exacto: ${stratExact[s]}/${n} = ${pct(stratExact[s], n)}`);
+for (const s of stratNames) console.log(`  ${s.padEnd(18)} exacto: ${stratExact[s] ?? 0}/${n} = ${pct(stratExact[s] ?? 0, n)}`);
 
 // Puntos de polla con el reglamento exacto=5, resultado=2, diferencia=1.
 let pts = 0;

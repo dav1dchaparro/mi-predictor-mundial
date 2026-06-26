@@ -70,6 +70,6 @@ const doc = tpl.replace("__DATA__", JSON.stringify(slim));
 writeFileSync("public/picks.html", doc);
 
 const conf = { alta: 0, media: 0, baja: 0 } as Record<string, number>;
-rows.forEach((r) => conf[r.confidence]++);
+rows.forEach((r) => { conf[r.confidence] = (conf[r.confidence] ?? 0) + 1; });
 console.log(`[buildPicksPage] ${rows.length} partidos | confianza ${JSON.stringify(conf)} -> public/picks.html + data/final_report.json`);
 let d = ""; rows.forEach((r) => { if (r.date !== d) { d = r.date; console.log(`\n[${d}]`); } console.log(`  ${r.time} ${r.group}  ${(r.home + " vs " + r.away).padEnd(34)} ${r.finalScore} (alt ${r.altScore}, ${r.confidence})`); });

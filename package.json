@@ -14,7 +14,10 @@
     "optimize": "tsx scripts/optimize.ts",
     "odds": "tsx scripts/odds.ts",
     "market": "tsx scripts/market.ts",
-    "fit": "tsx scripts/fit.ts"
+    "fit": "tsx scripts/fit.ts",
+    "refresh:data": "tsx scripts/ingestResults.ts && tsx scripts/fit.ts && tsx scripts/exportRemaining.ts",
+    "refresh:page": "tsx scripts/buildPicksPage.ts",
+    "diagnose": "tsx scripts/diagnose.ts"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.11",

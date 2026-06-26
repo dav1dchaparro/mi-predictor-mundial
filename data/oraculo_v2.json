@@ -1,0 +1,646 @@
+[
+  {
+    "match": "México vs Chequia",
+    "group": "A",
+    "date": "2026-06-25",
+    "finalScore": "1-0",
+    "altScore": "1-1",
+    "confidence": "media",
+    "risk": "Si México (con el liderato ya casi resuelto) rota y administra, un 1-1 de bajo perfil —moda real del modelo, empatada con 1-0 al 14%— se vuelve el exacto más probable.",
+    "rationale": "El mercado de marcador exacto y 4 de 6 lentes coinciden en 1-0 como modal: México ya clasificado, sólido en casa y de pocos goles, frente a una Chequia obligada a atacar. El 1-1 queda segundo (rotación mexicana), por delante del 2-0.",
+    "consensus": [
+      {
+        "score": "1-0",
+        "prob": 0.155
+      },
+      {
+        "score": "1-1",
+        "prob": 0.125
+      },
+      {
+        "score": "2-0",
+        "prob": 0.12
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "Sudáfrica vs Corea del Sur",
+    "group": "A",
+    "date": "2026-06-25",
+    "finalScore": "0-1",
+    "altScore": "1-1",
+    "confidence": "media",
+    "risk": "Sudáfrica, obligada a ganar para clasificar, se vuelca al ataque y deja espacios: Corea sentencia al contragolpe y amplía a 0-2 (alternativa contextual más fuerte que el 1-1).",
+    "rationale": "Mercado y modelo (las dos lentes más ponderadas) coinciden en 0-1 como marcador más probable: Corea favorita (~58%, -160) con tendencia Under 2.5 y victoria ajustada. El panel se reparte entre 0-1 y el empate 1-1, que queda como alternativa por el escenario de Corea cómoda con el empate.",
+    "consensus": [
+      {
+        "score": "0-1",
+        "prob": 0.155
+      },
+      {
+        "score": "1-1",
+        "prob": 0.135
+      },
+      {
+        "score": "0-2",
+        "prob": 0.105
+      },
+      {
+        "score": "0-0",
+        "prob": 0.1
+      },
+      {
+        "score": "1-2",
+        "prob": 0.095
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "Bosnia y Herzegovina vs Catar",
+    "group": "B",
+    "date": "2026-06-24",
+    "finalScore": "1-0",
+    "altScore": "2-0",
+    "confidence": "media",
+    "risk": "Bosnia rompe su sequia (max 1 gol en 7) y por necesidad de ganar por diferencia de gol golea a una defensa catari debilitada por suspensiones, cayendo en 2-0/2-1; o el partido abierto termina en empate bajo (1-1/0-0).",
+    "rationale": "Bosnia es favorita clara (1X2 1.37, ~68% Opta) ante una defensa catarí muy frágil; el mercado de marcador exacto y el modelo sitúan 2-0 levemente por encima de 2-1, con 1-0 como tercera opción. Confianza media porque, al ser eliminatorio para ambos, el escenario abierto eleva 2-1 casi al mismo nivel.",
+    "consensus": [
+      {
+        "score": "2-0",
+        "prob": 0.155
+      },
+      {
+        "score": "2-1",
+        "prob": 0.15
+      },
+      {
+        "score": "1-0",
+        "prob": 0.12
+      }
+    ],
+    "keptByVerifier": false
+  },
+  {
+    "match": "Canadá vs Suiza",
+    "group": "B",
+    "date": "2026-06-25",
+    "finalScore": "1-1",
+    "altScore": "0-1",
+    "confidence": "media",
+    "risk": "Suiza (favorita por xG: λ1.44 vs 1.14, 41% gana) DEBE ganar para superar a Canadá, que la aventaja en diferencia de gol, así que un triunfo visitante tipo 0-1 o 1-2 es el escenario alterno más realista — no el 1-0 local.",
+    "rationale": "Casi todas las lentes coinciden en 1-1 como pico claro (mercado, táctico, escenario fecha 3, alineaciones, forma-xG y h2h), reflejando un choque cerrado entre dos líderes a 4 puntos donde el empate favorece a ambos; la mínima ventaja local de Canadá empuja el 1-0 al segundo lugar por delante del 0-1.",
+    "consensus": [
+      {
+        "score": "1-1",
+        "prob": 0.165
+      },
+      {
+        "score": "1-0",
+        "prob": 0.105
+      },
+      {
+        "score": "0-1",
+        "prob": 0.095
+      },
+      {
+        "score": "1-2",
+        "prob": 0.085
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "Brasil vs Escocia",
+    "group": "C",
+    "date": "2026-06-24",
+    "finalScore": "1-0",
+    "altScore": "2-0",
+    "confidence": "media",
+    "risk": "Brasil sin rotar agrega un segundo gol tardío (vuelve el 2-0) o, si descansa titulares en dead rubber y Escocia aguanta el punto, sale el 1-1.",
+    "rationale": "Seis de las siete señales y el mercado de marcador exacto coinciden en 2-0 como el resultado más probable, con clean sheet de Brasil muy favorecido; 1-0 queda como segunda opción ante una Escocia roma en ataque.",
+    "consensus": [
+      {
+        "score": "2-0",
+        "prob": 0.19
+      },
+      {
+        "score": "1-0",
+        "prob": 0.15
+      },
+      {
+        "score": "2-1",
+        "prob": 0.12
+      },
+      {
+        "score": "3-0",
+        "prob": 0.09
+      },
+      {
+        "score": "1-1",
+        "prob": 0.08
+      }
+    ],
+    "keptByVerifier": false
+  },
+  {
+    "match": "Marruecos vs Haití",
+    "group": "C",
+    "date": "2026-06-24",
+    "finalScore": "2-0",
+    "altScore": "1-0",
+    "confidence": "alta",
+    "risk": "Que Marruecos golee por diferencia de gol contra Brasil y el exacto real sea 3-0 o 4-0, escenario que el modelo pondera (~11-12% para 3-0) pero por debajo de la moda.",
+    "rationale": "Todas las lentes convergen en victoria seca de Marruecos con valla en cero ante un Haití eliminado y sin goles; 2-0 es el modal unánime, con 1-0 y 3-0 como alternativas próximas.",
+    "consensus": [
+      {
+        "score": "2-0",
+        "prob": 0.21
+      },
+      {
+        "score": "1-0",
+        "prob": 0.16
+      },
+      {
+        "score": "3-0",
+        "prob": 0.15
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "USA vs Turquía",
+    "group": "D",
+    "date": "2026-06-26",
+    "finalScore": "1-1",
+    "altScore": "2-1",
+    "confidence": "media",
+    "risk": "El modelo lo ve como puro pick'em (λ 1.64-1.63, p1x2 36/27/36) con goles esperados altos (~3.3), no un partido bajo: un dead rubber abierto y rotado se desordena fácil hacia 2-1/1-2, y 1-1 solo tiene ~11% real.",
+    "rationale": "El 1-1 lidera en mercado, modelo y la mayoría de lentes del panel; el contexto de dead rubber (USA ya clasificada y rotando, Turquía eliminada y sin goles) empuja marcadores bajos, dejando 1-0 como alternativa muy cercana. Favorito blando, por eso confianza media.",
+    "consensus": [
+      {
+        "score": "1-1",
+        "prob": 0.155
+      },
+      {
+        "score": "1-0",
+        "prob": 0.135
+      },
+      {
+        "score": "2-1",
+        "prob": 0.115
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "Paraguay vs Australia",
+    "group": "D",
+    "date": "2026-06-26",
+    "finalScore": "1-1",
+    "altScore": "1-0",
+    "confidence": "media",
+    "risk": "Australia (mejor GD: 0 vs -2) se atrinchera por el empate que la clasifica mientras Paraguay, obligado a ganar, se expone al contragolpe, favoreciendo 0-1 o un 1-0 paraguayo.",
+    "rationale": "Todas las señales apuntan a un partido cerrado y de pocos goles (Under 2.5); el modelo ya corrigió su sesgo a 1-1, por lo que 1-0 (Paraguay obligado a ganar de local) y 1-1 quedan casi empatados arriba, con 0-0 muy cerca. Confianza media: convergen en pocos goles pero sin un favorito de marcador claro.",
+    "consensus": [
+      {
+        "score": "1-0",
+        "prob": 0.16
+      },
+      {
+        "score": "1-1",
+        "prob": 0.155
+      },
+      {
+        "score": "0-0",
+        "prob": 0.135
+      },
+      {
+        "score": "0-1",
+        "prob": 0.11
+      },
+      {
+        "score": "2-1",
+        "prob": 0.075
+      }
+    ],
+    "keptByVerifier": false
+  },
+  {
+    "match": "Alemania vs Ecuador",
+    "group": "E",
+    "date": "2026-06-25",
+    "finalScore": "1-0",
+    "altScore": "1-1",
+    "confidence": "media",
+    "risk": "Que la rotación masiva de una Alemania ya clasificada chatee el partido y aparezca el 0-0 o que Ecuador, obligado a ganar, por fin marque y caiga el 1-1.",
+    "rationale": "El mercado de marcador exacto y el modelo coinciden en 1-1 como tope, reforzado por el escenario de dead-rubber: Alemania ya clasificada rota en masa y Ecuador se lanza al ataque obligado a ganar, lo que deprime el goleo y eleva el empate ajustado; 1-0 queda como alternativa de victoria local mínima.",
+    "consensus": [
+      {
+        "score": "1-1",
+        "prob": 0.13
+      },
+      {
+        "score": "1-0",
+        "prob": 0.12
+      },
+      {
+        "score": "2-1",
+        "prob": 0.105
+      }
+    ],
+    "keptByVerifier": false
+  },
+  {
+    "match": "Curazao vs Costa de Marfil",
+    "group": "E",
+    "date": "2026-06-25",
+    "finalScore": "0-2",
+    "altScore": "0-1",
+    "confidence": "alta",
+    "risk": "Que Costa de Marfil (que aún NO está clasificada: 3 pts, va por puntos y diferencia de gol) golee a una Curazao ya casi sin opciones y el exacto se vaya a 0-3 en lugar de 0-2.",
+    "rationale": "Todas las lentes convergen en victoria visitante de Costa de Marfil por margen bajo con Curazao sin marcar; el mercado y el modelo favorecen 0-2 mientras el panel táctico/alineaciones inclina ligeramente a 0-1, dejando ambos casi empatados con favorito claro.",
+    "consensus": [
+      {
+        "score": "0-2",
+        "prob": 0.21
+      },
+      {
+        "score": "0-1",
+        "prob": 0.19
+      },
+      {
+        "score": "0-3",
+        "prob": 0.11
+      },
+      {
+        "score": "1-2",
+        "prob": 0.1
+      },
+      {
+        "score": "0-0",
+        "prob": 0.08
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "Países Bajos vs Túnez",
+    "group": "F",
+    "date": "2026-06-25",
+    "finalScore": "2-0",
+    "altScore": "3-0",
+    "confidence": "media",
+    "risk": "Túnez ya eliminada y Países Bajos clasificado pero peleando el liderato con Japón: rotación ligera baja el lambda local y empuja el exacto hacia 2-0/1-0, no hacia el 3-0 del agregador.",
+    "rationale": "Todas las lentes convergen en goleada local con Túnez en cero; el mercado de marcador exacto y la forma/xG empujan 3-0, seguido muy de cerca por 2-0, con favorito neerlandés clarísimo (~88% 1X2).",
+    "consensus": [
+      {
+        "score": "3-0",
+        "prob": 0.2
+      },
+      {
+        "score": "2-0",
+        "prob": 0.19
+      },
+      {
+        "score": "4-0",
+        "prob": 0.1
+      }
+    ],
+    "keptByVerifier": false
+  },
+  {
+    "match": "Japón vs Suecia",
+    "group": "F",
+    "date": "2026-06-25",
+    "finalScore": "2-1",
+    "altScore": "1-1",
+    "confidence": "media",
+    "risk": "No es dead rubber (Suecia casi obligada a ganar para no quedar eliminada con 3 pts, Japón pelea el 1º), asi que la refutacion por rotacion/empate de bajo perfil no aplica; el unico marcador que realmente supera a 2-1 es 1-1, que es la moda cruda del modelo (10-13%) — pero se corrige a la baja por el sesgo documentado de inflacion del 1-1, y condicionado a victoria de Japon 2-1 es la moda clara (17%).",
+    "rationale": "El mercado de marcador exacto y la mayoría del panel (alineaciones, forma-xG, H2H) convergen en 2-1 Japón, coherente con su rol de favorito ligero y la defensa sueca frágil; 1-1 queda muy cerca por el historial de empates, pero se ajusta a la baja porque el modelo infla ese marcador en favoritos moderados.",
+    "consensus": [
+      {
+        "score": "2-1",
+        "prob": 0.135
+      },
+      {
+        "score": "1-1",
+        "prob": 0.125
+      },
+      {
+        "score": "1-0",
+        "prob": 0.1
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "Bélgica vs Nueva Zelanda",
+    "group": "G",
+    "date": "2026-06-27",
+    "finalScore": "2-0",
+    "altScore": "1-0",
+    "confidence": "media",
+    "risk": "La sequía goleadora belga (1 gol en 2 partidos, 0 en el último) hace que un 1-0 a puerta cero sea casi tan probable como el 2-0 para clavar el exacto.",
+    "rationale": "Las seis señales y el mercado de marcador exacto coinciden en 2-0 como moda clara: Bélgica gran favorita (~80% 1X2), obligada a ganar, frente a la defensa más débil del grupo que ya recibió 5 goles; 1-0 emerge como segunda opción por la sequía goleadora belga.",
+    "consensus": [
+      {
+        "score": "2-0",
+        "prob": 0.21
+      },
+      {
+        "score": "1-0",
+        "prob": 0.14
+      },
+      {
+        "score": "3-0",
+        "prob": 0.12
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "Egipto vs Irán",
+    "group": "G",
+    "date": "2026-06-27",
+    "finalScore": "1-1",
+    "altScore": "1-0",
+    "confidence": "media",
+    "risk": "Egipto (ya clasificado, solo necesita empatar) rota y mantiene su valla mientras Irán no concreta, dejando un 1-0 local o un 2-0 si Egipto no rota tanto.",
+    "rationale": "Convergencia hacia marcadores bajos con Egipto favorito leve: el mercado de marcador exacto y el modelo colocan 1-0 como pick top, reforzado por táctico, forma-xG y h2h; el empate 1-1 queda muy cerca por el contexto de fecha 3, pero el sesgo pro-empate ya fue corregido.",
+    "consensus": [
+      {
+        "score": "1-0",
+        "prob": 0.16
+      },
+      {
+        "score": "1-1",
+        "prob": 0.15
+      },
+      {
+        "score": "0-0",
+        "prob": 0.12
+      },
+      {
+        "score": "2-1",
+        "prob": 0.1
+      },
+      {
+        "score": "0-1",
+        "prob": 0.09
+      }
+    ],
+    "keptByVerifier": false
+  },
+  {
+    "match": "España vs Uruguay",
+    "group": "H",
+    "date": "2026-06-27",
+    "finalScore": "0-1",
+    "altScore": "0-2",
+    "confidence": "media",
+    "risk": "Uruguay, con solo 2 puntos y obligado a ganar, se abre al ataque (marcó en sus dos partidos: 1-1 y 2-2) y el partido termina con ambos marcando (1-2/2-1 o empate 1-1), rompiendo la portería a cero del pick.",
+    "rationale": "El mercado, el modelo y la mayoria de lentes tacticas convergen en una victoria local ajustada: España es favorita clara (4-0 reciente, -209) ante un Uruguay defensivo, con total moderado que empuja marcadores bajos. El 1-0 domina como moda y el 2-0 queda como alternativa natural.",
+    "consensus": [
+      {
+        "score": "1-0",
+        "prob": 0.165
+      },
+      {
+        "score": "2-0",
+        "prob": 0.135
+      },
+      {
+        "score": "2-1",
+        "prob": 0.115
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "Cabo Verde vs Arabia Saudita",
+    "group": "H",
+    "date": "2026-06-27",
+    "finalScore": "1-1",
+    "altScore": "1-0",
+    "confidence": "media",
+    "risk": "Que la solidez defensiva de Cabo Verde (mejor del grupo) y el desplome ofensivo saudí (0-4 vs España) produzcan un 1-0 o 0-0 cerrado en vez del empate con goles.",
+    "rationale": "Casi todas las lentes (mercado, táctico, escenario, forma) ponen el 1-0 primero por la ventaja local de Cabo Verde y un partido de pocos goles; el 1-1 es la alternativa mejor respaldada por modelo y alineaciones. Confianza media: hay favorito leve y convergencia en marcadores bajos, pero 1-0 y 1-1 están muy parejos.",
+    "consensus": [
+      {
+        "score": "1-0",
+        "prob": 0.17
+      },
+      {
+        "score": "1-1",
+        "prob": 0.15
+      },
+      {
+        "score": "0-0",
+        "prob": 0.12
+      }
+    ],
+    "keptByVerifier": false
+  },
+  {
+    "match": "Francia vs Noruega",
+    "group": "I",
+    "date": "2026-06-26",
+    "finalScore": "1-1",
+    "altScore": "1-2",
+    "confidence": "media",
+    "risk": "Ambas ya clasificadas pero juegan por el 1er puesto del Grupo I, lo que puede abrir el partido y darle a Francia un triunfo ajustado (1-2 en orden Noruega-Francia) en vez del empate de bajo perfil.",
+    "rationale": "Casi todas las lentes (mercado, táctico, forma-xG, h2h, alineaciones) convergen en 2-1 Francia como marcador más probable, con 1-1 como segunda opción; favorito local claro (λ 1.76-1.26) y BTTS esperado por la racha de Haaland, lo que descarta el 0-0 y respalda un triunfo ajustado con goles en ambos arcos.",
+    "consensus": [
+      {
+        "score": "2-1",
+        "prob": 0.17
+      },
+      {
+        "score": "1-1",
+        "prob": 0.12
+      },
+      {
+        "score": "2-0",
+        "prob": 0.1
+      }
+    ],
+    "keptByVerifier": false
+  },
+  {
+    "match": "Senegal vs Irak",
+    "group": "I",
+    "date": "2026-06-26",
+    "finalScore": "1-0",
+    "altScore": "2-0",
+    "confidence": "media",
+    "risk": "Es un dead rubber real entre dos selecciones con 0 puntos y prácticamente eliminadas (Francia y Noruega ya con 6 pts), no un Senegal clasificado rotando; con ambos desmotivados el total se comprime hacia abajo y un empate de bajo perfil tipo 0-0 o 1-1 es la amenaza principal al exacto.",
+    "rationale": "Todas las lentes coinciden en 2-0 como marcador más probable (mercado, tactico, escenario, alineaciones, forma y h2h), con Senegal favorito claro ante un Irak muy frágil en defensa; 2-1 queda como alternativa por el gol ocasional visitante al contragolpe.",
+    "consensus": [
+      {
+        "score": "2-0",
+        "prob": 0.2
+      },
+      {
+        "score": "2-1",
+        "prob": 0.14
+      },
+      {
+        "score": "1-0",
+        "prob": 0.12
+      }
+    ],
+    "keptByVerifier": false
+  },
+  {
+    "match": "Argentina vs Jordania",
+    "group": "J",
+    "date": "2026-06-28",
+    "finalScore": "0-2",
+    "altScore": "0-1",
+    "confidence": "media",
+    "risk": "Que Argentina NO rote y su pegada convierta el partido en goleada (3-0/4-0), marcador casi tan probable como el 2-0 a lambda plena (2.98).",
+    "rationale": "Convergencia fuerte: Argentina favorito amplio con valla en cero y rotación que acota goleadas; 2-0 lidera en modelo y casi todo el panel, con 1-0 reforzado por el mercado inferido.",
+    "consensus": [
+      {
+        "score": "2-0",
+        "prob": 0.2
+      },
+      {
+        "score": "1-0",
+        "prob": 0.16
+      },
+      {
+        "score": "3-0",
+        "prob": 0.13
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "Argelia vs Austria",
+    "group": "J",
+    "date": "2026-06-28",
+    "finalScore": "1-1",
+    "altScore": "0-1",
+    "confidence": "media",
+    "risk": "Austria (favorita leve 2.9, Under 2.5 dominante) gana 0-1 ajustado, sobre todo si Argelia sin Amoura no marca en un partido de pocos goles.",
+    "rationale": "El 1-1 es primero en mercado, modelo y las cinco lentes del panel, así que domina pese al sesgo conocido de inflar el empate; mercado y modelo coinciden en 0-1 como segundo dado que Austria es leve favorita en un partido cerrado y de pocos goles.",
+    "consensus": [
+      {
+        "score": "1-1",
+        "prob": 0.15
+      },
+      {
+        "score": "0-1",
+        "prob": 0.11
+      },
+      {
+        "score": "1-0",
+        "prob": 0.095
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "Portugal vs Colombia",
+    "group": "K",
+    "date": "2026-06-27",
+    "finalScore": "1-1",
+    "altScore": "1-0",
+    "confidence": "media",
+    "risk": "Con Colombia (6 pts) ya clasificada y Portugal (4 pts) clasificado salvo derrota abultada, es un partido de bajo riesgo con rotación probable que puede morir en 0-0 en lugar de 1-1.",
+    "rationale": "El 1-1 es la moda en mercado, modelo y 5 de 6 lentes del panel: partido cerrado y de pocos goles donde a Colombia le basta el empate y Portugal debe abrirse. El 1-0 queda muy cerca por la localía y obligación lusa, de ahí la confianza media.",
+    "consensus": [
+      {
+        "score": "1-1",
+        "prob": 0.14
+      },
+      {
+        "score": "1-0",
+        "prob": 0.125
+      },
+      {
+        "score": "2-1",
+        "prob": 0.105
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "RD Congo vs Uzbekistán",
+    "group": "K",
+    "date": "2026-06-27",
+    "finalScore": "1-0",
+    "altScore": "0-0",
+    "confidence": "media",
+    "risk": "Partido de baja anotacion (lambda 1.15-0.85) con Uzbekistan ya eliminado y posible rotacion: un 0-0 o 1-1 de bajo perfil esta a solo 1-2 puntos del 1-0 en el modelo y es el escenario que mas probablemente tumba el exacto.",
+    "rationale": "El modelo y casi todo el panel táctico/escenario convergen en 1-0 como marcador modal con RD Congo favorito claro y obligado a ganar ante una defensa uzbeka muy frágil; el mercado de exacto infla algo el 1-1, pero queda por debajo. 2-0 es la segunda opción más respaldada.",
+    "consensus": [
+      {
+        "score": "1-0",
+        "prob": 0.19
+      },
+      {
+        "score": "2-0",
+        "prob": 0.13
+      },
+      {
+        "score": "1-1",
+        "prob": 0.12
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "Inglaterra vs Panamá",
+    "group": "L",
+    "date": "2026-06-27",
+    "finalScore": "0-2",
+    "altScore": "0-1",
+    "confidence": "alta",
+    "risk": "Inglaterra rota fuerte tras asegurar fácilmente el liderato y el dead-rubber de Panamá deriva en un 0-1 ajustado o un empate de bajo perfil (0-0/1-1) en vez de la victoria por dos goles.",
+    "rationale": "Convergencia casi total: 2-0 lidera mercado, modelo y cinco de seis lentes con Inglaterra favorito firme (~86-88% devig) y portería a cero muy probable ante una Panamá eliminada y sin goles. 1-0 supera levemente a 3-0 al promediar mercado (11%) y forma-xG (20%), favoreciendo una victoria controlada sobre la goleada.",
+    "consensus": [
+      {
+        "score": "2-0",
+        "prob": 0.21
+      },
+      {
+        "score": "1-0",
+        "prob": 0.14
+      },
+      {
+        "score": "3-0",
+        "prob": 0.13
+      }
+    ],
+    "keptByVerifier": true
+  },
+  {
+    "match": "Croacia vs Ghana",
+    "group": "L",
+    "date": "2026-06-27",
+    "finalScore": "1-0",
+    "altScore": "2-0",
+    "confidence": "alta",
+    "risk": "Croacia (3 pts) llega obligada a ganar y Ghana viene de un 0-0 ante Inglaterra: si Ghana repite bloqueo bajo y aguanta, el empate (0-0/1-1) sin marcador único domina y tumba el exacto.",
+    "rationale": "Casi todas las lentes convergen en 1-0: mercado, tactico, alineaciones, forma-xG y h2h lo colocan como moda. Croacia favorita obligada a ganar frente a una Ghana defensiva y poco goleadora, escenario de bajo volumen y victoria local ajustada.",
+    "consensus": [
+      {
+        "score": "1-0",
+        "prob": 0.19
+      },
+      {
+        "score": "2-0",
+        "prob": 0.13
+      },
+      {
+        "score": "2-1",
+        "prob": 0.11
+      }
+    ],
+    "keptByVerifier": true
+  }
+]

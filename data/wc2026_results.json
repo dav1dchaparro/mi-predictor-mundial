@@ -55,6 +55,7 @@
     { "group": "K", "date": "2026-06-17", "home": "Portugal", "hg": 1, "away": "DR Congo", "ag": 1 },
     { "group": "K", "date": "2026-06-17", "home": "Uzbekistan", "hg": 1, "away": "Colombia", "ag": 3 },
     { "group": "K", "date": "2026-06-23", "home": "Portugal", "hg": 5, "away": "Uzbekistan", "ag": 0 },
+    { "group": "K", "date": "2026-06-24", "home": "Colombia", "hg": 1, "away": "DR Congo", "ag": 0 },
 
     { "group": "L", "date": "2026-06-17", "home": "England", "hg": 4, "away": "Croatia", "ag": 2 },
     { "group": "L", "date": "2026-06-17", "home": "Ghana", "hg": 1, "away": "Panama", "ag": 0 },
