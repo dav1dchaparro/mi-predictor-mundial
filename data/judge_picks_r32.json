@@ -1,0 +1,44 @@
+[
+  {
+    "match": "España vs Austria",
+    "finalScore": "2-0",
+    "altScore": "1-0",
+    "confidence": "media",
+    "rationale": "La moda del mercado exacto de Pinnacle en vivo es 2-0 (5.89, ~17% implícito) por delante del 1-0 (7.12, ~14%), y esa es la señal individual más fuerte; el modelo los tiene casi empatados (1-0 al 16% vs 2-0 al 15%), así que el mercado desempata. Los expertos que dan marcador exacto coinciden: Dimers (0-2 España) y Sports Illustrated (2-0), y encaja con las lentes del partido: España no ha encajado gol en el torneo mientras Austria (6 GC, sin portería a cero en Mundiales desde 1982) sufre bajas cero pero defensa frágil, y el 2-0 sigue respetando la tendencia under 2.5 que piden Eimer y FOX. Las bajas españolas en banda (Nico Williams, Pino) moderan la goleada pero no impiden dos goles ante esa zaga. ⚠️ Escenario alterno más realista: un 1-0 trabajado si Austria modula su pressing y España gestiona ventaja corta con Yamal dosificado, exactamente el guion under que ven los expertos de totales."
+  },
+  {
+    "match": "Portugal vs Croacia",
+    "finalScore": "1-1",
+    "altScore": "2-1",
+    "confidence": "media",
+    "rationale": "El 1-1 es la moda del mercado exacto de Pinnacle en vivo (6.96, la cuota más baja, ~14.4% implícito) y empata como marcador más probable del modelo (14%, igualado con el 1-0). El BTTS yes claramente favorecido (1.67 vs 2.27) desempata contra el 1-0/2-0: el mercado espera gol de ambos. El contexto refuerza un partido corto y trabado: calor extremo (~44°C de sensación) en BMO Field, Croacia buscando estirar el partido con Modrić-Kovačić (histórico de eliminatorias largas) y línea O/U 2.75 perfectamente pareja. ⚠️ El escenario alterno más realista es el 2-1 de Portugal (2ª cuota de Pinnacle @7.94 y predicción unánime de Sports Mole, Rotowire y SI): Portugal gana pero encajando, consistente con el BTTS yes y su favoritismo (~1.70, 51-56% en 90')."
+  },
+  {
+    "match": "Suiza vs Argelia",
+    "finalScore": "1-1",
+    "altScore": "1-0",
+    "confidence": "media",
+    "rationale": "La moda del mercado de marcador exacto de Pinnacle (1-1 @6.28, la cuota más baja) y la moda del modelo (1-1, 14%) coinciden, y según las reglas del backtest esa doble coincidencia es el pick casi siempre. La línea de goles 2.25 casi pareja y las noticias respaldan un partido cerrado con gol de ambos: Argelia encajó 7 pero marcó en todos sus partidos (BTTS yes 1.86 vs no 1.96, casi parejo), y Suiza arrastra 88 años sin ganar una eliminatoria mundialista con solo 1 victoria en 90' en sus últimas 12 eliminatorias grandes (E5 P6), patrón que apunta a empate y prórroga. Suiza es favorita moderada (1.94), no dominante, y el propio payload advierte que un 1-1 con prórroga es el riesgo principal frente al consenso 2-1 de los expertos. ⚠️ El escenario alterno más realista es el 1-0 suizo (segunda cuota más baja, 6.66, y evOptimo del modelo): Suiza controla, la baja de Amoura resta pegada argelina y Petkovic conoce el sistema rival pero no logra perforarlo."
+  },
+  {
+    "match": "Australia vs Egipto",
+    "finalScore": "1-1",
+    "altScore": "0-1",
+    "confidence": "alta",
+    "rationale": "La moda del mercado exacto de Pinnacle (1-1 @5.77, la cuota más baja) y la moda del modelo (1-1, 15%) coinciden — la señal más fuerte posible según el backtest. El perfil del partido lo respalda: línea de goles bajísima (1.75-2.0), tendencia clara al under, Australia con bloque bajo y solo 0.67 GF/partido, y Egipto con la duda física de Salah que reduce su pegada. El 1X2 está muy parejo (32/30/39 en el modelo; Egipto favorito solo ligero a 2.53), lo que hace del empate a un gol el resultado más denso en probabilidad. ⚠️ Escenario alterno más realista: si Salah juega y Egipto impone su mayor calidad ante una Australia que no marcó en 2 de 3 partidos, el 0-1 (0-0 al descanso, gol egipcio decide) es la salida — es el pick de Rotowire/TFA y cotiza 6.33, tercero del mercado."
+  },
+  {
+    "match": "Argentina vs Cabo Verde",
+    "finalScore": "2-0",
+    "altScore": "3-0",
+    "confidence": "alta",
+    "rationale": "La moda del mercado exacto de Pinnacle (2-0 @5.32, cuota más baja) y la moda del modelo (2-0 con 18%) coinciden, que es el escenario de máxima señal según el backtest. Encaja el guion: Argentina de gala con Messi (6 goles), Cabo Verde en bloque bajo que solo marcó 2 en 3 partidos, y O/U 2.75 levemente cargado al under con portería a cero argentina muy probable (BTTS ni cotiza destacado). Expertos alineados: Chris Sutton y Sports Mole dicen 2-0; el calor y humedad de Miami (33°C) más el cuadro cómodo reducen el incentivo de goleada extensa. ⚠️ El escenario alterno más realista es 3-0 (segunda cuota de Pinnacle @6.48, 13% del modelo, pick de TotalFootballAnalysis y Yahoo) si Argentina rompe temprano el bloque caboverdiano y el partido se abre."
+  },
+  {
+    "match": "Colombia vs Ghana",
+    "finalScore": "1-0",
+    "altScore": "2-0",
+    "confidence": "media",
+    "rationale": "Todas las lentes coinciden en 1-0: es la moda del mercado exacto de Pinnacle en vivo (5.92, la cuota más baja) y la moda del modelo (15%), con Sports Mole y shekicks/juvefc prediciendo exactamente 1-0. El guion lo respalda: Ghana en bloque bajo con Queiroz, tendencia clara al under (línea 2.25, Under 2.5 a -163), calor extremo en Kansas City (índice ~35°C al pitazo) y el dato Opta de que los últimos 4 triunfos de Colombia ante africanas en Mundiales fueron todos por un gol de margen. Colombia además acumula 2 vallas invictas seguidas y Ghana solo suma 2 goles en 3 partidos. ⚠️ El escenario alterno más realista es el 2-0 (Pinnacle 6.31, apenas detrás; pick de totalfootballanalysis): si Colombia abre el marcador temprano y Ghana debe salir del bloque, un segundo gol en transición de Díaz/Arias es muy plausible."
+  }
+]

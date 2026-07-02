@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>16avos de final · Mundial 2026 — Marcadores para el prode</title>
+<meta name="description" content="Bracket de los 16avos del Mundial 2026: resultados reales y el marcador a jugar en el prode, modelo propio anclado a mercado.">
+<style>
+  :root{
+    --field:#0A130F; --panel:#101E17; --panel2:#15251C; --raise:#1A2E23;
+    --line:#24382C; --line-soft:#1B2A21;
+    --ink:#EAF1EC; --muted:#84998C; --dim:#5F7568;
+    --gold:#F4B740; --gold-dim:#7a5f1f;
+    --exact:#3FCF7E; --ok:#56C7D6; --miss:#E36A5E;
+    --display:"Arial Narrow","Roboto Condensed","Helvetica Neue",system-ui,sans-serif;
+    --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:
+      radial-gradient(120% 80% at 50% -10%, #12241B 0%, var(--field) 55%) fixed;
+    color:var(--ink); font-family:var(--body);
+    -webkit-font-smoothing:antialiased; line-height:1.5; min-height:100vh;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:clamp(20px,4vw,56px) clamp(16px,4vw,32px) 72px}
+
+  /* ---------- Masthead ---------- */
+  .mast{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:8px}
+  .kicker{
+    font-size:12px; letter-spacing:.32em; text-transform:uppercase;
+    color:var(--gold); font-weight:600; margin:0 0 10px;
+  }
+  h1{
+    font-family:var(--display); font-weight:800; text-transform:uppercase;
+    font-size:clamp(40px,9vw,86px); line-height:.92; letter-spacing:.01em;
+    margin:0; text-wrap:balance;
+  }
+  h1 .yr{color:var(--muted)}
+  .lede{max-width:60ch; color:var(--muted); margin:16px 0 0; font-size:15px}
+  .lede b{color:var(--ink); font-weight:600}
+
+  /* ---------- Calibration scoreboard ---------- */
+  .board{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px;
+    background:var(--line-soft); border:1px solid var(--line);
+    border-radius:14px; overflow:hidden; margin:28px 0 8px;
+  }
+  .cell{background:var(--panel); padding:16px 18px; display:flex; flex-direction:column; gap:4px}
+  .cell .lab{font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim)}
+  .cell .big{font-family:var(--display); font-weight:800; font-size:34px; line-height:1;
+    font-variant-numeric:tabular-nums; letter-spacing:.01em}
+  .cell .sub{font-size:12.5px; color:var(--muted)}
+  .cell.hl .big{color:var(--gold)}
+  .cell.gd .big{color:var(--exact)}
+
+  /* ---------- Section headers ---------- */
+  .sec{display:flex; align-items:baseline; gap:14px; margin:52px 0 20px}
+  .sec h2{
+    font-family:var(--display); text-transform:uppercase; font-weight:800;
+    font-size:clamp(22px,4vw,30px); letter-spacing:.02em; margin:0; white-space:nowrap;
+  }
+  .sec .rule{flex:1; height:1px; background:var(--line)}
+  .sec .tag{font-size:12px; color:var(--muted); letter-spacing:.04em; white-space:nowrap}
+
+  /* ---------- Match grid ---------- */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px}
+  .match{
+    background:linear-gradient(180deg,var(--panel2),var(--panel));
+    border:1px solid var(--line); border-radius:14px; padding:16px 16px 0;
+    display:flex; flex-direction:column;
+    opacity:0; transform:translateY(10px);
+    animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  @keyframes rise{to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion:reduce){.match{animation:none; opacity:1; transform:none}}
+
+  .meta{
+    font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--dim); display:flex; justify-content:space-between; gap:8px;
+  }
+  .teams{display:flex; align-items:center; gap:10px; margin:14px 0 4px}
+  .team{display:flex; align-items:center; gap:10px; flex:1; min-width:0}
+  .team.away{flex-direction:row-reverse; text-align:right}
+  .flag{font-size:30px; line-height:1; flex:none;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+  .name{font-family:var(--display); font-weight:700; text-transform:uppercase;
+    font-size:19px; letter-spacing:.01em; line-height:1.05; overflow:hidden; text-overflow:ellipsis}
+  .mid{flex:none; text-align:center; min-width:44px}
+  .mid .vs{font-size:11px; color:var(--dim); letter-spacing:.14em; text-transform:uppercase}
+  .mid .rs{font-family:var(--display); font-weight:800; font-size:30px; line-height:1;
+    font-variant-numeric:tabular-nums; letter-spacing:.02em}
+
+  .pen{font-size:12px; color:var(--gold); text-align:center; margin:2px 0 0; letter-spacing:.02em}
+
+  /* prode band (upcoming) */
+  .prode{
+    margin:14px -16px 0; padding:12px 16px;
+    background:linear-gradient(90deg, rgba(244,183,64,.08), rgba(244,183,64,.13));
+    border-top:1px solid var(--gold-dim);
+    display:flex; align-items:center; justify-content:space-between;
+    border-radius:0 0 13px 13px;
+  }
+  .prode .pl{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); font-weight:600}
+  .prode .ps{font-family:var(--display); font-weight:800; font-size:34px; line-height:1;
+    color:var(--gold); font-variant-numeric:tabular-nums; letter-spacing:.03em}
+
+  /* footer of card */
+  .foot{display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:11px 0 14px; font-size:12.5px; color:var(--muted); min-height:44px}
+  .foot .adv b{color:var(--ink); font-weight:600}
+  .odds{font-variant-numeric:tabular-nums; color:var(--dim); font-size:11.5px; letter-spacing:.02em}
+
+  .badge{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600;
+    padding:5px 10px; border-radius:999px; border:1px solid; letter-spacing:.01em}
+  .badge.exact{color:var(--exact); border-color:rgba(63,207,126,.35); background:rgba(63,207,126,.08)}
+  .badge.ok{color:var(--ok); border-color:rgba(86,199,214,.3); background:rgba(86,199,214,.07)}
+  .badge.miss{color:var(--miss); border-color:rgba(227,106,94,.3); background:rgba(227,106,94,.07)}
+  .modelpick{color:var(--dim); font-size:11.5px}
+  .modelpick b{color:var(--muted); font-weight:600}
+
+  /* legend + footer */
+  .legend{display:flex; flex-wrap:wrap; gap:16px; margin:18px 2px 0; font-size:12.5px; color:var(--muted)}
+  .legend span{display:inline-flex; align-items:center; gap:7px}
+  .dot{width:9px; height:9px; border-radius:2px; flex:none}
+  footer{margin-top:56px; padding-top:22px; border-top:1px solid var(--line);
+    color:var(--dim); font-size:12.5px; line-height:1.7}
+  footer b{color:var(--muted)}
+  .home{display:inline-block; margin-bottom:22px; font-size:12px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--muted); text-decoration:none}
+  .home:hover{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="home" href="/">← Inicio</a>
+  <header class="mast">
+    <p class="kicker">Mundial 2026 · Prode</p>
+    <h1>16avos de final <span class="yr">·&nbsp;Round of 32</span></h1>
+    <p class="lede">El bracket completo. Los partidos por jugar traen el <b>marcador para el prode</b> — modelo propio (Poisson · Dixon-Coles) anclado a mercado real: <b>Pinnacle</b> + consenso <b>FOX/FanDuel</b>. Los jugados muestran el resultado real y si el modelo lo clavó.</p>
+
+    <div class="board" id="board"></div>
+    <p class="lede" style="font-size:12.5px;margin-top:12px">Calibración <b>en vivo</b> del modelo sobre los 9 partidos ya disputados — sin re-ajustar nada con datos del torneo.</p>
+  </header>
+
+  <div class="sec">
+    <h2>Por jugar</h2><div class="rule"></div>
+    <span class="tag">tu marcador para el prode ↓</span>
+  </div>
+  <div class="grid" id="up"></div>
+
+  <div class="sec">
+    <h2>Ya jugados</h2><div class="rule"></div>
+    <span class="tag">resultado real · modelo pre-partido</span>
+  </div>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--exact)"></i> Marcador exacto</span>
+    <span><i class="dot" style="background:var(--ok)"></i> Acertó el resultado (1X2)</span>
+    <span><i class="dot" style="background:var(--miss)"></i> Falló</span>
+  </div>
+  <div class="grid" id="done" style="margin-top:16px"></div>
+
+  <footer>
+    <b>Fuentes:</b> bracket y resultados verificados en CBS Sports, FOX Sports y ESPN. Cuotas EN VIVO de Pinnacle (guest API) + FanDuel/DraftKings/bet365, snapshot 2-jul-2026 ~16:00 UTC (devig de Shin, Pinnacle ×2, anclaje completo con línea de goles O/U, ensamble 50/50 con el modelo).<br>
+    <b>Marcador prode = pick del panel de jueces</b>: modelo + mercado de marcador exacto de Pinnacle + noticias (bajas, táctica, clima), con réplica adversarial. Análisis de entretenimiento, no casa de apuestas.
+  </footer>
+</div>
+
+<script>
+const F = {
+  "Sudáfrica":"🇿🇦","Canadá":"🇨🇦","Brasil":"🇧🇷","Japón":"🇯🇵","Alemania":"🇩🇪","Paraguay":"🇵🇾",
+  "Países Bajos":"🇳🇱","Marruecos":"🇲🇦","Costa de Marfil":"🇨🇮","Noruega":"🇳🇴","Francia":"🇫🇷","Suecia":"🇸🇪",
+  "México":"🇲🇽","Ecuador":"🇪🇨","Inglaterra":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","RD Congo":"🇨🇩","Bélgica":"🇧🇪","Senegal":"🇸🇳",
+  "USA":"🇺🇸","Bosnia y Herzegovina":"🇧🇦","España":"🇪🇸","Austria":"🇦🇹","Portugal":"🇵🇹","Croacia":"🇭🇷",
+  "Suiza":"🇨🇭","Argelia":"🇩🇿","Australia":"🇦🇺","Egipto":"🇪🇬","Argentina":"🇦🇷","Cabo Verde":"🇨🇻",
+  "Colombia":"🇨🇴","Ghana":"🇬🇭"
+};
+const dash = s => s.replace("-","–");
+const flag = n => F[n] || "🏳️";
+
+const UP = [
+  {date:"Jul 2",city:"Los Ángeles",home:"España",away:"Austria",prode:"2-0",favTeam:"España",favPct:77,mk:"1.33 · 5.82 · 13.6"},
+  {date:"Jul 2",city:"Toronto",home:"Portugal",away:"Croacia",prode:"1-1",favTeam:"Portugal",favPct:65,mk:"1.76 · 3.83 · 5.82"},
+  {date:"Jul 2",city:"Vancouver",home:"Suiza",away:"Argelia",prode:"1-1",favTeam:"Suiza",favPct:61,mk:"1.99 · 3.54 · 4.65"},
+  {date:"Jul 3",city:"Dallas",home:"Australia",away:"Egipto",prode:"1-1",favTeam:"Egipto",favPct:53,mk:"3.53 · 3.02 · 2.60"},
+  {date:"Jul 3",city:"Miami",home:"Argentina",away:"Cabo Verde",prode:"2-0",favTeam:"Argentina",favPct:87,mk:"1.19 · 8.65 · 22.9"},
+  {date:"Jul 3",city:"Kansas City",home:"Colombia",away:"Ghana",prode:"1-0",favTeam:"Colombia",favPct:73,mk:"1.57 · 4.24 · 7.99"},
+];
+
+const DONE = [
+  {date:"Jun 28",city:"Los Ángeles",home:"Sudáfrica",away:"Canadá",real:"0-1",pen:"",hit:"exact",pick:"0-1"},
+  {date:"Jun 29",city:"Houston",home:"Brasil",away:"Japón",real:"2-1",pen:"",hit:"ok",pick:"1-1"},
+  {date:"Jun 29",city:"Boston",home:"Alemania",away:"Paraguay",real:"1-1",pen:"Paraguay 4–3 pen",hit:"exact",pick:"1-1"},
+  {date:"Jun 29",city:"Monterrey",home:"Países Bajos",away:"Marruecos",real:"1-1",pen:"Marruecos 3–2 pen",hit:"exact",pick:"1-1"},
+  {date:"Jun 30",city:"Dallas",home:"Costa de Marfil",away:"Noruega",real:"1-2",pen:"",hit:"ok",pick:"1-1"},
+  {date:"Jun 30",city:"Nueva York",home:"Francia",away:"Suecia",real:"3-0",pen:"",hit:"ok",pick:"2-1"},
+  {date:"Jun 30",city:"Ciudad de México",home:"México",away:"Ecuador",real:"2-0",pen:"",hit:"miss",pick:"0-0"},
+  {date:"Jul 1",city:"Atlanta",home:"Inglaterra",away:"RD Congo",real:"2-1",pen:"",hit:"ok",pick:"1-0"},
+  {date:"Jul 1",city:"Seattle",home:"Bélgica",away:"Senegal",real:"3-2",pen:"tiempo extra",hit:"ok",pick:"1-1"},
+  {date:"Jul 1",city:"Santa Clara",home:"USA",away:"Bosnia y Herzegovina",real:"2-0",pen:"",hit:"ok",pick:"2-1"},
+];
+
+const teamHTML = (n, away=false) =>
+  `<div class="team${away?' away':''}"><span class="flag">${flag(n)}</span><span class="name">${n}</span></div>`;
+
+function boardHTML(){
+  const b=[
+    {lab:"Jugados",big:"10",sub:"de 16 cruces",cls:""},
+    {lab:"Marcador exacto",big:"3/10",sub:"30% clavados",cls:"gd"},
+    {lab:"Resultado (1X2)",big:"7/10",sub:"70% acertados",cls:"hl"},
+    {lab:"Por jugar",big:"6",sub:"con marcador prode",cls:""},
+  ];
+  document.getElementById("board").innerHTML = b.map(c=>
+    `<div class="cell ${c.cls}"><span class="lab">${c.lab}</span><span class="big">${c.big}</span><span class="sub">${c.sub}</span></div>`
+  ).join("");
+}
+
+function renderUp(){
+  document.getElementById("up").innerHTML = UP.map((m,i)=>`
+    <article class="match" style="animation-delay:${i*45}ms">
+      <div class="meta"><span>${m.date}</span><span>${m.city}</span></div>
+      <div class="teams">
+        ${teamHTML(m.home)}
+        <div class="mid"><div class="vs">vs</div></div>
+        ${teamHTML(m.away,true)}
+      </div>
+      <div class="prode">
+        <span class="pl">Marcador prode</span>
+        <span class="ps">${dash(m.prode)}</span>
+      </div>
+      <div class="foot">
+        <span class="adv">${m.favTeam==="Volado"?"Avance: <b>volado 50/50</b>":`Avanza <b>${m.favTeam} ${m.favPct}%</b>`}</span>
+        <span class="odds">${m.mk}</span>
+      </div>
+    </article>`).join("");
+}
+
+function renderDone(){
+  const label={exact:"Exacto",ok:"Resultado",miss:"Falló"};
+  document.getElementById("done").innerHTML = DONE.map((m,i)=>`
+    <article class="match" style="animation-delay:${i*40}ms">
+      <div class="meta"><span>${m.date}</span><span>${m.city}</span></div>
+      <div class="teams">
+        ${teamHTML(m.home)}
+        <div class="mid"><div class="rs">${dash(m.real)}</div></div>
+        ${teamHTML(m.away,true)}
+      </div>
+      ${m.pen?`<div class="pen">${m.pen}</div>`:""}
+      <div class="foot">
+        <span class="modelpick">Modelo: <b>${dash(m.pick)}</b></span>
+        <span class="badge ${m.hit}">${m.hit==="exact"?"✓":m.hit==="ok"?"≈":"✕"} ${label[m.hit]}</span>
+      </div>
+    </article>`).join("");
+}
+
+boardHTML(); renderUp(); renderDone();
+</script>
+</body>
+</html>

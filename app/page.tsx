@@ -25,9 +25,14 @@ export default function Home() {
         <div>
           <div className="uptick text-[10px] text-muted">Favorito al título · 10.000 simulaciones</div>
           <div className="mt-1 text-5xl font-bold text-chalk md:text-6xl">{champ?.name}</div>
-          <Link href="/captura/torneo" className="mt-2 inline-block uptick text-[10px] text-acid hover:underline">
-            Modo captura ↗
-          </Link>
+          <div className="mt-2 flex gap-4">
+            <Link href="/captura/torneo" className="inline-block uptick text-[10px] text-acid hover:underline">
+              Modo captura ↗
+            </Link>
+            <a href="/r32.html" className="inline-block uptick text-[10px] text-acid hover:underline">
+              16avos · prode ↗
+            </a>
+          </div>
         </div>
         <div className="flex gap-8">
           <BigStat value={pct(champ?.champion ?? 0)} label="Campeón" accent />

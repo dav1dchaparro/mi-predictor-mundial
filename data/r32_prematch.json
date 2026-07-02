@@ -1,0 +1,15 @@
+{
+  "note": "Predicciones PRE-partido congeladas (lo que el modelo dijo ANTES de cada juego, REPORTE-R32 del 1-jul). r32.ts las usa para los 'ya jugados' en vez de re-predecir con fuerzas refiteadas que ya vieron esos resultados (contaminación).",
+  "matches": [
+    { "home": "Sudáfrica", "away": "Canadá", "p1x2": { "home": 15, "draw": 28, "away": 57 }, "moda": "0-1", "golesEsp": "1-2" },
+    { "home": "Brasil", "away": "Japón", "p1x2": { "home": 36, "draw": 28, "away": 36 }, "moda": "1-1", "golesEsp": "1-1" },
+    { "home": "Alemania", "away": "Paraguay", "p1x2": { "home": 59, "draw": 23, "away": 18 }, "moda": "1-1", "golesEsp": "2-1" },
+    { "home": "Países Bajos", "away": "Marruecos", "p1x2": { "home": 31, "draw": 32, "away": 37 }, "moda": "1-1", "golesEsp": "1-1" },
+    { "home": "Costa de Marfil", "away": "Noruega", "p1x2": { "home": 22, "draw": 28, "away": 50 }, "moda": "1-1", "golesEsp": "1-2" },
+    { "home": "Francia", "away": "Suecia", "p1x2": { "home": 72, "draw": 16, "away": 12 }, "moda": "2-1", "golesEsp": "3-1" },
+    { "home": "México", "away": "Ecuador", "p1x2": { "home": 30, "draw": 40, "away": 30 }, "moda": "0-0", "golesEsp": "1-1" },
+    { "home": "Inglaterra", "away": "RD Congo", "p1x2": { "home": 55, "draw": 32, "away": 13 }, "moda": "1-0", "golesEsp": "1-0" },
+    { "home": "Bélgica", "away": "Senegal", "p1x2": { "home": 50, "draw": 26, "away": 25 }, "moda": "1-1", "golesEsp": "2-1" },
+    { "home": "USA", "away": "Bosnia y Herzegovina", "p1x2": { "home": 66, "draw": 20, "away": 14 }, "moda": "2-1", "golesEsp": "2-1" }
+  ]
+}

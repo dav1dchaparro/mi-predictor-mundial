@@ -36,6 +36,17 @@
 6. **Reportar** en 5-8 líneas: qué resultados nuevos entraron, cómo cambió la tabla de la
    polla (si se sabe), qué picks cambiaron y por qué, y cuántos partidos quedan.
 
+## Eliminatorias (R32 en adelante) — pipeline 2-jul
+- `scripts/r32.ts` lee mercado fresco de `data/r32_market.json` (multi-casa + línea O/U +
+  marcador exacto de Pinnacle): con O/U el anclaje de lambdas es COMPLETO. Ese JSON lo
+  produce un workflow de research (Pinnacle guest API + web). El pick final sale del panel
+  de jueces (`data/judge_picks_r32.json`, mismo formato que judge_picks_md3).
+- `data/r32_prematch.json` congela las predicciones PRE-partido de los ya jugados: tras el
+  refit NO se re-predicen (contaminaría la calibración en vivo). Al predecir un partido
+  nuevo, AGREGAR su predicción al snapshot antes del siguiente refit.
+- Resultados de eliminatorias van a `data/wc2026_results.json` con group "R32" y marcador
+  a los 90' (si hubo prórroga, usar el parcial de los 90).
+
 ## Recordatorios honestos
 - Techo real del marcador exacto ~10-13%. No prometer más.
 - NO re-tunear hiperparámetros (nu/rho) con partidos del torneo en curso (sobreajuste).
